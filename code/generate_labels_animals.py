@@ -22,7 +22,8 @@ classes = {
 # get the bounding boxes, transform them into yolo representation cx,cy,w,h
 
 for image in image_ids:
-    file = open(label_dir+image+'.txt', 'w')
+    filename = image.split('/')[-1]
+    file = open(label_dir+filename+'.txt', 'w')
     bboxes = [annot for annot in json_data if annot['image_id'] == image]
     for bbox in bboxes:
         x, y, w, h = bbox['bbox']  # origin at upper-left
@@ -39,7 +40,7 @@ for image in image_ids:
         cy = cy / height
         h = h / height
 
-        str_ = classes['animal'] + ' ' + ' '.join([cx, cy, w, h]) + '\n'
+        str_ = '%i %f %f %f %f\n'%(classes['animal'], cx, cy, w, h)
 
         file.write(str_)
     file.close()
