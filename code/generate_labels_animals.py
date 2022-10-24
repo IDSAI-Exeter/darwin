@@ -39,7 +39,7 @@ for image in image_ids:
         cy = cy / height
         h = h / height
 
-        str = classes['animal'] + ' ' + ' '.join([cx, cy, w, h]) + '\n'
+        str_ = classes['animal'] + ' ' + ' '.join([cx, cy, w, h]) + '\n'
 
-        file.write(str)
+        file.write(str_)
     file.close()
