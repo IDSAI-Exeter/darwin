@@ -1,1 +1,1 @@
-python3 ../lib/yolov5/train.py --data ../data/serengeti_bboxes.yaml --batch-size 1
+python3 ../lib/yolov5/train.py --data ../data/experiments/n1/experiment.yaml --batch-size 1
