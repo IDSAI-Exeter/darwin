@@ -1,0 +1,1 @@
+python3 ../lib/yolov5/train.py --data ../data/serengeti_bboxes.yaml --batch-size 1

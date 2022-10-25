@@ -15,7 +15,7 @@ image_ids = list(set([annot['image_id'] for annot in json_data]))
 
 # classes
 classes = {
-    'animal' : 0,
+    'animal': 0,
     'vehicule': 1
 }
 
@@ -40,7 +40,7 @@ for image in image_ids:
         cy = cy / height
         h = h / height
 
-        str_ = '%i %f %f %f %f\n'%(classes['animal'], cx, cy, w, h)
+        str_ = '%i %f %f %f %f\nq'%(classes['animal'], cx, cy, w, h)
 
         file.write(str_)
     file.close()
