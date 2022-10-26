@@ -92,20 +92,20 @@ def main():
 
         print('# bboxes train:', n_train_set, ' # val:', n_val_set, '# test :', n_test_set)
 
-    for bbox in train_set:
-        filename = bbox["image_id"].split('/')[-1]
+    for image_id in train_set:
+        filename = image_id.split('/')[-1]
         d = 'train/'
         os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels'))
 
-    for bbox in test_set:
-        filename = bbox["image_id"].split('/')[-1]
+    for image_id in test_set:
+        filename = image_id.split('/')[-1]
         d = 'test/'
         os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels'))
 
-    for bbox in val_set:
-        filename = bbox["image_id"].split('/')[-1]
+    for image_id in val_set:
+        filename = image_id.split('/')[-1]
         d = 'val/'
         os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels'))
