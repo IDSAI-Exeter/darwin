@@ -37,13 +37,21 @@ def main():
     train_set = []
     test_set = []
     val_set = []
+
+    # remove missing images from bbox
+    print('bboxes : ', len(json_data))
+    json_data = [bbox for bbox in json_data if os.path.isfile(dataset_dir + 'images/' + bbox["image_id"].split('/')[-1] + '.JPG')]
+    print('bboxes with file :', len(json_data))
+
     # select n images across species
     for sp in species:
         individuals = [bbox for bbox in json_data if bbox['species'] == sp]
-        sample = random.sample(individuals, n*3)
-        train_set += sample[0:int(len(sample)/3)]
-        val_set += sample[int(len(sample)/3):2*int(len(sample)/3)]
-        test_set += sample[2*int(len(sample)/3):]
+        print('species : ', sp, '# :', len(individuals))
+        if len(individuals) > n*3:
+            sample = random.sample(individuals, n*3)
+            train_set += sample[0:int(len(sample)/3)]
+            val_set += sample[int(len(sample)/3):2*int(len(sample)/3)]
+            test_set += sample[2*int(len(sample)/3):]
 
     for bbox in train_set:
         filename = bbox["image_id"].split('/')[-1]
@@ -64,7 +72,7 @@ def main():
         os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels'))
 
     with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
-        yaml_file.write("path: %s\n"%experiment_dir)
+        yaml_file.write("path: ../%s\n"%experiment_dir)
         yaml_file.write("train: train/images/\n")
         yaml_file.write("test: test/images/\n")
         yaml_file.write("val: val/images/\n")

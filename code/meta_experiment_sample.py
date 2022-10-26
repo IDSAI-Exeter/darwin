@@ -53,8 +53,8 @@ def main():
         images = [bbox['image_id'] for bbox in individuals]
         counts = Counter(images)
 
-        print('species : ', sp, '# :', len(individuals))
-        print('        # images :', len(counts.keys()))
+        #print('species :', sp, '# :', len(individuals))
+        #print('        # images :', len(counts.keys()))
 
         shuffled = list(set(images))
         random.shuffle(shuffled)
@@ -62,7 +62,6 @@ def main():
         # take 80% of the list considering # of individual per image
         n = sum(counts.values())
         i = 0
-        split = []
 
         if n < 10:
             continue
@@ -88,26 +87,28 @@ def main():
 
         n_test_set = i - n_train_set - n_val_set
 
-        print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
+        #print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
 
-        print('# bboxes train:', n_train_set, ' # val:', n_val_set, '# test :', n_test_set)
+        #print('# bboxes train:', n_train_set, ' # val:', n_val_set, '# test :', n_test_set)
+
+    print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
 
     for image_id in train_set:
         filename = image_id.split('/')[-1]
         d = 'train/'
-        os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images'+filename+'.JPG'))
+        os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels'))
 
     for image_id in test_set:
         filename = image_id.split('/')[-1]
         d = 'test/'
-        os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images'+filename+'.JPG'))
+        os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels'))
 
     for image_id in val_set:
         filename = image_id.split('/')[-1]
         d = 'val/'
-        os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images'+filename+'.JPG'))
+        os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels'))
 
     with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
