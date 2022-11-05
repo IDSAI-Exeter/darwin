@@ -7,8 +7,11 @@ from collections import Counter
 n = 1
 
 dataset_dir = "../data/serengeti_bboxes/"
-
-experiment_dir = "../data/experiments/sample/"
+#experiment_dir = "../data/experiments/sample/"
+experiment_dir = "../data/experiments/sample80/"
+train_ratio = .8
+test_ratio = .1
+val_ratio = .1
 
 def main():
     try:
@@ -66,21 +69,21 @@ def main():
         if n < 10:
             continue
 
-        while i/n < 0.1:
+        while i/n < train_ratio: #0.01:
             train_set.append(shuffled[0])
             i += counts[shuffled[0]]
             shuffled = shuffled[1:]
 
         n_train_set = i
 
-        while i/n < 0.15:
+        while i/n < train_ratio+test_ratio: #0.015:
             val_set.append(shuffled[0])
             i += counts[shuffled[0]]
             shuffled = shuffled[1:]
 
         n_val_set = i - n_train_set
 
-        while i/n < 0.20:
+        while i/n < train_ratio+test_ratio+val_ratio: #0.020:
             test_set.append(shuffled[0])
             i += counts[shuffled[0]]
             shuffled = shuffled[1:]
@@ -88,7 +91,6 @@ def main():
         n_test_set = i - n_train_set - n_val_set
 
         #print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
-
         #print('# bboxes train:', n_train_set, ' # val:', n_val_set, '# test :', n_test_set)
 
     print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
