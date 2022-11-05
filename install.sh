@@ -8,4 +8,6 @@ cd yolov5;
 pip3 install -qr requirements.txt
 cd ../../
 pip3 install rembg[gpu]
-mkdir data;mkdir data/experiments;mkdir data/runs 
+mkdir data;mkdir data/experiments;mkdir data/runs
+mkdir data/animals
+
