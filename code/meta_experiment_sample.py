@@ -8,7 +8,7 @@ n = 1
 
 dataset_dir = "../data/serengeti_bboxes/"
 #experiment_dir = "../data/experiments/sample/"
-experiment_dir = "../data/experiments/sample80/"
+experiment_dir = "../data/experiments/sample10/"
 train_ratio = .1
 test_ratio = .01
 val_ratio = .01
