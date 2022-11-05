@@ -9,9 +9,9 @@ n = 1
 dataset_dir = "../data/serengeti_bboxes/"
 #experiment_dir = "../data/experiments/sample/"
 experiment_dir = "../data/experiments/sample80/"
-train_ratio = .8
-test_ratio = .1
-val_ratio = .1
+train_ratio = .1
+test_ratio = .01
+val_ratio = .01
 
 def main():
     try:

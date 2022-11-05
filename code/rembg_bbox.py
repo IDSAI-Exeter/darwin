@@ -36,6 +36,9 @@ if __name__ == '__main__':
         filename = instance['image_id'].split('/')[-1]
         species = instance['species']
         bbox = instance['bbox']  # origin at upper-left
-        image = cv2.imread(image_dir + filename + '.JPG')
-        segment = remove_bg_from_bbox(image, bbox)
-        cv2.imwrite(segments_dir + species + '_' + filename + '_' + str(int(bbox[0])) + '.jpg', segment)
+        try:
+            image = cv2.imread(image_dir + filename + '.JPG')
+            segment = remove_bg_from_bbox(image, bbox)
+            cv2.imwrite(segments_dir + species + '_' + filename + '_' + str(int(bbox[0])) + '.jpg', segment)
+        except:
+            pass
