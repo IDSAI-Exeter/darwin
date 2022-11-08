@@ -7,7 +7,7 @@ git clone https://github.com/ultralytics/yolov5;
 cd yolov5;
 pip3 install -qr requirements.txt
 cd ../../
-pip3 install rembg[gpu]
+pip3 install rembg
 mkdir data;mkdir data/experiments;mkdir data/runs
 mkdir data/animals
-
+pip3 install pandas
