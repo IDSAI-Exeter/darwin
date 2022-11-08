@@ -3,15 +3,16 @@ import json
 import os
 import random
 from collections import Counter
+import pandas
 
 n = 1
 
 dataset_dir = "../data/serengeti_bboxes/"
 #experiment_dir = "../data/experiments/sample/"
-experiment_dir = "../data/experiments/sample10/"
-train_ratio = .1
-test_ratio = .01
-val_ratio = .01
+experiment_dir = "../data/experiments/sample_species/"
+train_ratio = .01
+test_ratio = .005
+val_ratio = .005
 
 def main():
     try:
@@ -49,6 +50,8 @@ def main():
     print('bboxes : ', len(json_data))
     json_data = [bbox for bbox in json_data if os.path.isfile(dataset_dir + 'images/' + bbox["image_id"].split('/')[-1] + '.JPG')]
     print('bboxes with file :', len(json_data))
+
+    species_counts = []
 
     # select n images across species
     for sp in species:
@@ -94,42 +97,45 @@ def main():
 
         n_val_set = i
 
-        #print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
-        print('  # train:', n_train_set, ' # val:', n_val_set, '# test :', n_test_set)
+        #print('  # train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
+        #print('  #train:', n_train_set, ' #val:', n_val_set, '#test :', n_test_set)
+        species_counts.append({'species': sp, 'total': len(individuals), 'train' : n_train_set, 'test' : n_test_set, 'val' : n_val_set})
 
     print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
+    species_counts = pandas.DataFrame(species_counts)
+    species_counts.to_csv(experiment_dir + 'counts.csv')
 
-    for image_id in train_set:
-        filename = image_id.split('/')[-1]
-        d = 'train/'
-        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-        os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
-
-    for image_id in test_set:
-        filename = image_id.split('/')[-1]
-        d = 'test/'
-        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-        os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
-
-    for image_id in val_set:
-        filename = image_id.split('/')[-1]
-        d = 'val/'
-        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-        os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
-
-    with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
-        yaml_file.write("path: ../%s\n"%experiment_dir)
-        yaml_file.write("train: train/images/\n")
-        yaml_file.write("test: test/images/\n")
-        yaml_file.write("val: val/images/\n")
-        yaml_file.write("\n")
-        yaml_file.write("names:\n")
-        yaml_file.write("   0: animal\n")
-        yaml_file.write("   1: vehicule\n")
-        yaml_file.close()
-
+    # for image_id in train_set:
+    #     filename = image_id.split('/')[-1]
+    #     d = 'train/'
+    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+    #     os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+    #
+    # for image_id in test_set:
+    #     filename = image_id.split('/')[-1]
+    #     d = 'test/'
+    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+    #     os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+    #
+    # for image_id in val_set:
+    #     filename = image_id.split('/')[-1]
+    #     d = 'val/'
+    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+    #     os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+    #
+    # with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
+    #     yaml_file.write("path: ../%s\n"%experiment_dir)
+    #     yaml_file.write("train: train/images/\n")
+    #     yaml_file.write("test: test/images/\n")
+    #     yaml_file.write("val: val/images/\n")
+    #     yaml_file.write("\n")
+    #     yaml_file.write("names:\n")
+    #     yaml_file.write("   0: animal\n")
+    #     yaml_file.write("   1: vehicule\n")
+    #     yaml_file.close()
+    #
 if __name__ == "__main__":
     main()

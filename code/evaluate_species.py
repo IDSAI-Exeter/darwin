@@ -18,11 +18,12 @@ def bb_intersection_over_union(boxA, boxB):
     return iou
 
 
-
 test_labels_dir = '../data/experiments/sample/test/labels/'
 detect_labels_dir = '../lib/yolov5/runs/detect/exp/labels/'
 
 import glob
+
+from statistics import mean
 
 test_labels_files = glob.glob(test_labels_dir + '*.txt')
 detect_labels_files = glob.glob(detect_labels_dir + '*.txt')
@@ -49,9 +50,22 @@ for file in detect_labels_files:
 #print(test_labels_dic)
 #print(detect_labels_dic)
 
+import json
+json_data = None
+with open('../data/bbox_species.json') as json_file:
+    json_data = json.load(json_file)
+    json_file.close()
+
+image_species = {}
+
+for bbox in json_data:
+    image_species[bbox['image_id'].split('/')[-1]] = bbox['species']
+
 bboxes_accuracy = []
 log_errors = []
 areas = []
+
+species_accuracy = {}
 
 for k in test_labels_dic.keys():
     t_bboxes = test_labels_dic[k]
@@ -71,9 +85,32 @@ for k in test_labels_dic.keys():
         areas.append(w*h)
         import math
         log_errors.append(math.log(1-accuracy))
+        if image_species[k] not in species_accuracy.keys():
+            species_accuracy[image_species[k]] = []
+        species_accuracy[image_species[k]].append(accuracy)
+        print(image_species[k])
+
 
 import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 16})
+plt.rcParams.update({'font.size': 14})
+
+x = []
+y = []
+z = []
+
+for k in species_accuracy.keys():
+    x.append(k)
+    y.append(mean(species_accuracy[k]))
+    z.append(len(species_accuracy[k]))
+
+x = [e for _, e in sorted(zip(y, x))]
+y = sorted(y)
+
+plt.barh(x, width=y, label=x)
+plt.xlabel('avg iou accuracy')
+plt.show()
+
+exit()
 
 # plot = plt.scatter(bboxes_accuracy, areas)
 # plt.ylabel('bbox area')
