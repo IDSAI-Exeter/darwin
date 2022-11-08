@@ -36,9 +36,14 @@ def main():
         json_data = json.load(json_file)
         json_file.close()
 
+    species_file = '../data/serengeti_bboxes/species_classes.json'
+    species_classes = json.load(open(species_file))
+
     # get species list
     species = list(set([bbox['species'] for bbox in json_data]))
 
+    species.remove('empty')
+    species.remove('human')
 
     # A random 80/10/10 split
 
@@ -105,37 +110,37 @@ def main():
     species_counts = pandas.DataFrame(species_counts)
     species_counts.to_csv(experiment_dir + 'counts.csv')
 
-    # for image_id in train_set:
-    #     filename = image_id.split('/')[-1]
-    #     d = 'train/'
-    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-    #     os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
-    #
-    # for image_id in test_set:
-    #     filename = image_id.split('/')[-1]
-    #     d = 'test/'
-    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-    #     os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
-    #
-    # for image_id in val_set:
-    #     filename = image_id.split('/')[-1]
-    #     d = 'val/'
-    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-    #     os.system("cp %s %s"%(dataset_dir+'labels/'+filename+'.txt', experiment_dir+d+'labels/'))
-    #
-    # with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
-    #     yaml_file.write("path: ../%s\n"%experiment_dir)
-    #     yaml_file.write("train: train/images/\n")
-    #     yaml_file.write("test: test/images/\n")
-    #     yaml_file.write("val: val/images/\n")
-    #     yaml_file.write("\n")
-    #     yaml_file.write("names:\n")
-    #     yaml_file.write("   0: animal\n")
-    #     yaml_file.write("   1: vehicule\n")
-    #     yaml_file.close()
-    #
+    for image_id in train_set:
+        filename = image_id.split('/')[-1]
+        d = 'train/'
+        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+        os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+
+    for image_id in test_set:
+        filename = image_id.split('/')[-1]
+        d = 'test/'
+        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+        os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+
+    for image_id in val_set:
+        filename = image_id.split('/')[-1]
+        d = 'val/'
+        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+        os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+
+    with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
+        yaml_file.write("path: ../%s\n"%experiment_dir)
+        yaml_file.write("train: train/images/\n")
+        yaml_file.write("test: test/images/\n")
+        yaml_file.write("val: val/images/\n")
+        yaml_file.write("\n")
+        yaml_file.write("names:\n")
+        for k, v in species_classes.items():
+            yaml_file.write("   %i: %s\n"%(v,k))
+        yaml_file.close()
+
 if __name__ == "__main__":
     main()

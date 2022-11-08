@@ -1,7 +1,13 @@
 import json
+import os
 
-label_dir = '../data/serengeti_bboxes/labels/'
+label_dir = '../data/serengeti_bboxes/species_labels/'
 data_dir = '../data/'
+
+try:
+    os.mkdir(label_dir)
+except:
+    pass
 
 json_data = None
 
@@ -14,11 +20,20 @@ with open('../data/bbox_species.json') as json_file:
 image_ids = list(set([annot['image_id'] for annot in json_data]))
 
 # classes
-classes = {
-    'animal': 0,
-    'vehicule': 1
-}
 
+species = list(set([bbox['species'] for bbox in json_data]))
+
+classes = {}
+
+i = 0
+
+for species_ in species:
+    classes[species_] = i
+    i += 1
+
+species_file = '../data/serengeti_bboxes/species_classes.json'
+
+json.dump(classes, open(species_file, 'w'))
 # get the bounding boxes, transform them into yolo representation cx,cy,w,h
 
 for image in image_ids:
@@ -40,7 +55,7 @@ for image in image_ids:
         cy = cy / height
         h = h / height
 
-        str_ = '%i %f %f %f %f\n'%(classes['animal'], cx, cy, w, h)
+        str_ = '%i %f %f %f %f\n'%(classes[bbox['species']], cx, cy, w, h)
 
         file.write(str_)
     file.close()
