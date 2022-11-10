@@ -1,4 +1,6 @@
 import glob
+import os
+
 import cv2
 from scipy import ndimage
 import random
@@ -11,16 +13,32 @@ def flatten(l):
 def main(train_dir, empty_imgs_dir, augmented_dir):
 
     print(train_dir, empty_imgs_dir)
-
+    i = 0
     #training_set = os.listdir(train_dir)
 
-    train_files = glob.glob(train_dir + '/images/*.JPG')
-    train_labels = glob.glob(train_dir + '/labels/*.txt')
+    train_files = glob.glob(train_dir + '/train' + '/images/*.JPG')
+    train_labels = glob.glob(train_dir + '/train' + '/labels/*.txt')
     empty_images = glob.glob(empty_imgs_dir + '*.JPG')
+
+    try:
+        os.mkdir(augmented_dir)
+        os.mkdir(augmented_dir + '/images')
+        os.mkdir(augmented_dir + '/labels')
+    except:
+        pass
+
+    # cp -r train augmented
 
     # animal_dir = '../data/animals/'
     # animal_image = cv2.imread(animals[15])
     # animals = glob.glob(animal_dir + '*.jpg')
+
+    import yaml
+    classes = {}
+
+    with open(train_dir + '/experiment.yaml') as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+        classes = {v: k for k, v in data['names'].items()}
 
     json_data = None
 
@@ -49,62 +67,86 @@ def main(train_dir, empty_imgs_dir, augmented_dir):
                 w = int(w) + 20
                 h = int(h) + 20
 
-                cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 3)
+                # cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 3)
 
                 # cv2.imshow('augment', image)
                 # cv2.waitKey(0)
 
                 crop_img = image[y:y + h, x:x + w]
-                animal_image = remove(crop_img)
+                animal_image = remove(crop_img) #, alpha_matting=True)
 
                 mask = animal_image[:, :, 3]
-                alpha_ratio = sum(flatten([[1 if p != 0 else 0 for p in l] for l in mask])) / sum(flatten([[1 for p in l] for l in mask]))
+                alpha_ratio = sum(flatten([[1 if p > 200 else 0 for p in l] for l in mask])) / sum(flatten([[1 for p in l] for l in mask]))
 
                 # cv2.imshow('augment', image)
                 # cv2.waitKey(0)
 
-                if alpha_ratio > 0.2:
-                    print(alpha_ratio)
+                if alpha_ratio > 0.3:
 
-                    n_rand = random.randint(0, len(empty_images))
-                    empty_image = cv2.imread(empty_images[n_rand])
+                    i += 1
 
-                    s_img = animal_image
-                    l_img = empty_image
+                    max_augmented = 10
 
-                    x_offset = y_offset = 50
+                    for n in range(0, random.randint(0, max_augmented)):
 
-                    scale_percent = random.randint(50, 200)
-                    width = int(s_img.shape[1] * scale_percent / 100)
-                    height = int(s_img.shape[0] * scale_percent / 100)
-                    dim = (width, height)
+                        n_rand = random.randint(0, len(empty_images))
+                        empty_image = cv2.imread(empty_images[n_rand])
+                        s_img = animal_image.copy()
+                        l_img = empty_image
 
-                    s_img = cv2.flip(s_img, 1)
+                        x_offset = y_offset = 50
 
-                    s_img = cv2.resize(s_img, dim)
+                        scale_percent = random.randint(80, 200)
+                        width = int(s_img.shape[1] * scale_percent / 100)
+                        height = int(s_img.shape[0] * scale_percent / 100)
+                        dim = (width, height)
 
-                    angle = random.randint(-30, 30)
+                        s_img = cv2.flip(s_img, random.randint(0, 1))
 
-                    s_img = ndimage.rotate(s_img, angle)
+                        s_img = cv2.resize(s_img, dim)
 
-                    if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0 ):
-                        x_offset = random.randint(0, l_img.shape[1] - s_img.shape[1])
-                        y_offset = random.randint(0, l_img.shape[0] - s_img.shape[0])
+                        angle = random.randint(-30, 30)
 
-                        y1, y2 = y_offset, y_offset + s_img.shape[0]
-                        x1, x2 = x_offset, x_offset + s_img.shape[1]
+                        s_img = ndimage.rotate(s_img, angle)
 
-                        alpha_s = s_img[:, :, 3] / 255.0
-                        alpha_l = 1.0 - alpha_s
+                        if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0 ):
+                            x_offset = random.randint(0, l_img.shape[1] - s_img.shape[1])
+                            y_offset = random.randint(0, l_img.shape[0] - s_img.shape[0])
 
-                        for c in range(0, 3):
-                            l_img[y1:y2, x1:x2, c] = (alpha_s * s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
+                            y1, y2 = y_offset, y_offset + s_img.shape[0]
+                            x1, x2 = x_offset, x_offset + s_img.shape[1]
 
-                        cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
+                            alpha_s = s_img[:, :, 3] / 255.0
+                            alpha_l = 1.0 - alpha_s
+                            import numpy
+                            #alpha_m = numpy.array([[1 if p != 0 else 0 for p in l] for l in s_img[:, :, 3]])
+                            #alpha_l = 1.0 - alpha_m
 
-                        cv2.imshow('augment', l_img)
+                            for c in range(0, 3):
+                                #l_img[y1:y2, x1:x2, c] = (alpha_m * s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
+                                l_img[y1:y2, x1:x2, c] = (alpha_s * s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
+                                # l_img[y1:y2, x1:x2, c] = ( s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
 
-                        cv2.waitKey(0)
+
+                            #cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
+
+                            cv2.imwrite(augmented_dir + '/images/' + str(i) + '_' + str(n) + '.JPG', l_img)
+
+                            # convert to center x, center y, w, h
+                            cx = x1 + s_img.shape[1] / 2.0
+                            cy = y1 + s_img.shape[0] / 2.0
+
+                            # Normalise
+                            cx = cx / l_img.shape[1]
+                            w_ = s_img.shape[1] / l_img.shape[1]
+                            cy = cy / l_img.shape[0]
+                            h_ = s_img.shape[0] / l_img.shape[0]
+
+                            str_ = '%i %f %f %f %f\n' % (classes[bbox['species']], cx, cy, w_, h_)
+                            open(augmented_dir + '/labels/' + str(i) + '_' + str(n) + '.txt', 'w').write(str_)
+
+                            # cv2.imshow('augment', l_img)
+                            # cv2.waitKey(0)
 
 if __name__ == '__main__':
     import sys, getopt
