@@ -94,7 +94,7 @@ def main(test_labels_dir, detect_labels_dir, plotfilepath):
 
 
     import matplotlib.pyplot as plt
-    plt.rcParams.update({'font.size': 14})
+    plt.rcParams.update({'font.size': 8})
 
     x = []
     y = []
