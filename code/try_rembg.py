@@ -51,5 +51,4 @@ if __name__ == '__main__':
 
     cv2.imshow('image', image)
 
-
     cv2.waitKey(0)

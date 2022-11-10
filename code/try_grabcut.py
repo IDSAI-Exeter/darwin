@@ -37,6 +37,10 @@ if __name__ == '__main__':
 
     bbox = (int(x), int(y), int(x+w), int(y+h))
 
+    cv2.rectangle(image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0,255,0), 3)
+
+    cv2.imshow('image', image)
+
     fgModel = np.zeros((1, 65), dtype="float")
     bgModel = np.zeros((1, 65), dtype="float")
 
@@ -55,7 +59,6 @@ if __name__ == '__main__':
         ("Probable Foreground", cv2.GC_PR_FGD),
     )
 
-    cv2.imshow('image', image)
     # loop over the possible GrabCut mask values
     outputMask = np.where((mask == cv2.GC_BGD) | (mask == cv2.GC_PR_BGD),
                           0, 1)
@@ -69,7 +72,6 @@ if __name__ == '__main__':
 
     cv2.waitKey(0)
 
-    exit()
 
     for (name, value) in values:
         # construct a mask that for the current value

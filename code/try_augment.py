@@ -13,9 +13,11 @@ if __name__ == '__main__':
     label_dir = '../data/serengeti_bboxes/labels/'
     image_dir = '../data/serengeti_bboxes/images/'
     data_dir = '../data/'
+
     with open('../data/bbox_species.json') as json_file:
         json_data = json.load(json_file)
         json_file.close()
+
 
     image_ids = list(set([annot['image_id'] for annot in json_data]))
 
