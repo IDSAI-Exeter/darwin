@@ -119,9 +119,10 @@ if __name__ == '__main__':
     test_labels_dir = ''
     detect_labels_dir = ''
     plotfilepath = ''
+    argv = sys.argv[1:]
 
     try:
-        opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
+        opts, args = getopt.getopt(argv, "ht:d:o:", ["testdir=", "detectdir=", "ofile="])
     except getopt.GetoptError:
         print('test.py -t <testlabeldir> -d <detectedtestlabeldir> -o <plotfilename>')
         sys.exit(2)
