@@ -18,145 +18,175 @@ def bb_intersection_over_union(boxA, boxB):
     return iou
 
 
-test_labels_dir = '../data/experiments/sample/test/labels/'
-detect_labels_dir = '../lib/yolov5/runs/detect/exp/labels/'
+#test_labels_dir = '../data/experiments/sample/test/labels/'
+#detect_labels_dir = '../lib/yolov5/runs/detect/exp/labels/'
 
-import glob
 
-from statistics import mean
+def main(test_labels_dir, detect_labels_dir, plotfilepath):
+    import glob
 
-test_labels_files = glob.glob(test_labels_dir + '*.txt')
-detect_labels_files = glob.glob(detect_labels_dir + '*.txt')
+    from statistics import mean
 
-test_labels_dic = {}
-detect_labels_dic = {}
+    test_labels_files = glob.glob(test_labels_dir + '*.txt')
+    detect_labels_files = glob.glob(detect_labels_dir + '*.txt')
 
-for file in test_labels_files:
-    test_f = open(file).readlines()
-    bboxes =[]
-    for line in test_f:
-        cl, x, y, w, h = line.split()
-        bboxes.append([float(cl), float(x), float(y), float(w), float(h), 1.0])
-    test_labels_dic[file.split('/')[-1].split('.')[0]] = bboxes
+    test_labels_dic = {}
+    detect_labels_dic = {}
 
-for file in detect_labels_files:
-    f = open(file).readlines()
-    bboxes = []
-    for line in f:
-        cl, x, y, w, h, cf = line.split()
-        bboxes.append([float(cl), float(x), float(y), float(w), float(h), float(cf)])
-    detect_labels_dic[file.split('/')[-1].split('.')[0]] = bboxes
+    for file in test_labels_files:
+        test_f = open(file).readlines()
+        bboxes =[]
+        for line in test_f:
+            cl, x, y, w, h = line.split()
+            bboxes.append([float(cl), float(x), float(y), float(w), float(h), 1.0])
+        test_labels_dic[file.split('/')[-1].split('.')[0]] = bboxes
 
-#print(test_labels_dic)
-#print(detect_labels_dic)
+    for file in detect_labels_files:
+        f = open(file).readlines()
+        bboxes = []
+        for line in f:
+            cl, x, y, w, h, cf = line.split()
+            bboxes.append([float(cl), float(x), float(y), float(w), float(h), float(cf)])
+        detect_labels_dic[file.split('/')[-1].split('.')[0]] = bboxes
 
-import json
-json_data = None
-with open('../data/bbox_species.json') as json_file:
-    json_data = json.load(json_file)
-    json_file.close()
+    #print(test_labels_dic)
+    #print(detect_labels_dic)
 
-image_species = {}
+    import json
+    json_data = None
+    with open('../data/bbox_species.json') as json_file:
+        json_data = json.load(json_file)
+        json_file.close()
 
-for bbox in json_data:
-    image_species[bbox['image_id'].split('/')[-1]] = bbox['species']
+    image_species = {}
 
-bboxes_accuracy = []
-log_errors = []
-areas = []
+    for bbox in json_data:
+        image_species[bbox['image_id'].split('/')[-1]] = bbox['species']
 
-species_accuracy = {}
+    bboxes_accuracy = []
+    log_errors = []
+    areas = []
 
-for k in test_labels_dic.keys():
-    t_bboxes = test_labels_dic[k]
-    d_bboxes = []
+    species_accuracy = {}
+
+    for k in test_labels_dic.keys():
+        t_bboxes = test_labels_dic[k]
+        d_bboxes = []
+        try:
+            d_bboxes = detect_labels_dic[k]
+        except:
+            pass
+        for cl, x, y, w, h, cf in t_bboxes:
+            ious = []
+            for cl2, x2, y2, w2, h2, cf2 in d_bboxes:
+                ious.append(bb_intersection_over_union([x, y, x+w, y+h], [x2, y2, x2+w2, y2+h2]))
+            accuracy = 0
+            if ious!=[]:
+                accuracy = max(ious)
+            bboxes_accuracy.append(accuracy)
+            areas.append(w*h)
+            import math
+            log_errors.append(math.log(1-accuracy))
+            if image_species[k] not in species_accuracy.keys():
+                species_accuracy[image_species[k]] = []
+            species_accuracy[image_species[k]].append(accuracy)
+            print(image_species[k])
+
+
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'font.size': 14})
+
+    x = []
+    y = []
+    z = []
+
+    for k in species_accuracy.keys():
+        x.append(k)
+        y.append(mean(species_accuracy[k]))
+        z.append(len(species_accuracy[k]))
+
+    x = [e for _, e in sorted(zip(y, x))]
+    y = sorted(y)
+
+    plt.barh(x, width=y, label=x)
+    plt.xlabel('avg iou accuracy')
+    plt.savefig(plotfilepath)
+
+
+if __name__ == '__main__':
+    import sys, getopt
+
+    test_labels_dir = ''
+    detect_labels_dir = ''
+    plotfilepath = ''
+
     try:
-        d_bboxes = detect_labels_dic[k]
-    except:
-        pass
-    for cl, x, y, w, h, cf in t_bboxes:
-        ious = []
-        for cl2, x2, y2, w2, h2, cf2 in d_bboxes:
-            ious.append(bb_intersection_over_union([x, y, x+w, y+h], [x2, y2, x2+w2, y2+h2]))
-        accuracy = 0
-        if ious!=[]:
-            accuracy = max(ious)
-        bboxes_accuracy.append(accuracy)
-        areas.append(w*h)
-        import math
-        log_errors.append(math.log(1-accuracy))
-        if image_species[k] not in species_accuracy.keys():
-            species_accuracy[image_species[k]] = []
-        species_accuracy[image_species[k]].append(accuracy)
-        print(image_species[k])
+        opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
+    except getopt.GetoptError:
+        print('test.py -t <testlabeldir> -d <detectedtestlabeldir> -o <plotfilename>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('test.py -t <testlabeldir> -d <detectedtestlabeldir> -o <plotfilename>')
+            sys.exit()
+        elif opt in ("-t", "--testdir"):
+            test_labels_dir = arg
+        elif opt in ("-d", "--detectdir"):
+            detect_labels_dir = arg
+        elif opt in ("-o", "--ofile"):
+            plotfilepath = arg
+
+    main(test_labels_dir, detect_labels_dir, plotfilepath)
 
 
-import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 14})
+    # exit()
 
-x = []
-y = []
-z = []
+    # plot = plt.scatter(bboxes_accuracy, areas)
+    # plt.ylabel('bbox area')
+    # plt.xlabel('iou accuracy')
+    # plt.show()
+    #
+    # plot = plt.scatter(log_errors, areas)
+    # plt.ylabel('bbox area')
+    # plt.xlabel('log iou error')
+    # plt.show()
+    #
+    # fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
+    #
+    # axs[0].hist(areas, 10)
+    # axs[0].set_xlabel('bbox area')
+    # #axs[0].show()
+    #
+    # axs[1].hist(bboxes_accuracy, 10)
+    # axs[1].set_xlabel('iou accuracy')
+    # plt.show()
 
-for k in species_accuracy.keys():
-    x.append(k)
-    y.append(mean(species_accuracy[k]))
-    z.append(len(species_accuracy[k]))
-
-x = [e for _, e in sorted(zip(y, x))]
-y = sorted(y)
-
-plt.barh(x, width=y, label=x)
-plt.xlabel('avg iou accuracy')
-plt.show()
-
-exit()
-
-# plot = plt.scatter(bboxes_accuracy, areas)
-# plt.ylabel('bbox area')
-# plt.xlabel('iou accuracy')
-# plt.show()
-#
-# plot = plt.scatter(log_errors, areas)
-# plt.ylabel('bbox area')
-# plt.xlabel('log iou error')
-# plt.show()
-#
-# fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
-#
-# axs[0].hist(areas, 10)
-# axs[0].set_xlabel('bbox area')
-# #axs[0].show()
-#
-# axs[1].hist(bboxes_accuracy, 10)
-# axs[1].set_xlabel('iou accuracy')
-# plt.show()
-
-plt.hist2d(bboxes_accuracy, areas)
-plt.ylabel('areas')
-plt.xlabel('iou accuracy')
-plt.show()
-
-bins = [[], [], [], [], [], [], [], [], [], []] # [[]] * 10
-
-from statistics import mean
-
-for area, accuracy in zip(areas, bboxes_accuracy):
-    #print(int(area*10), area)
-    bins[int(area*10)].append(accuracy)
-
-bins_means = []
-
-for bin in bins:
-    print(len(bin))
-    bins_means.append(mean(bin))
-
-print(bins_means)
-
-n = 0
-for m in bins_means:
-    plt.bar(n, m, 0.1, edgecolor='black')
-    n+=0.1
-plt.xlabel('area')
-plt.ylabel('avg iou accuracy')
-plt.show()
+    # plt.hist2d(bboxes_accuracy, areas)
+    # plt.ylabel('areas')
+    # plt.xlabel('iou accuracy')
+    # plt.show()
+    #
+    # bins = [[], [], [], [], [], [], [], [], [], []] # [[]] * 10
+    #
+    # from statistics import mean
+    #
+    # for area, accuracy in zip(areas, bboxes_accuracy):
+    #     #print(int(area*10), area)
+    #     bins[int(area*10)].append(accuracy)
+    #
+    # bins_means = []
+    #
+    # for bin in bins:
+    #     print(len(bin))
+    #     bins_means.append(mean(bin))
+    #
+    # print(bins_means)
+    #
+    # n = 0
+    # for m in bins_means:
+    #     plt.bar(n, m, 0.1, edgecolor='black')
+    #     n+=0.1
+    #
+    # plt.xlabel('area')
+    # plt.ylabel('avg iou accuracy')
+    # plt.show()
