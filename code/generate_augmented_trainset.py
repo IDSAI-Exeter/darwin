@@ -1,3 +1,5 @@
+# python3 generate_augmented_trainset.py -t ../data/experiments/sample_species -e ../data/empty_images/ -a ../data/experiments/sample_species/augmented
+
 import glob
 import os
 
@@ -101,7 +103,8 @@ def main(train_dir, empty_imgs_dir, augmented_dir):
                         height = int(s_img.shape[0] * scale_percent / 100)
                         dim = (width, height)
 
-                        s_img = cv2.flip(s_img, random.randint(0, 1))
+                        if random.randint(0, 1):
+                            s_img = cv2.flip(s_img, 1)
 
                         s_img = cv2.resize(s_img, dim)
 
