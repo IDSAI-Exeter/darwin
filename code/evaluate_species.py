@@ -79,7 +79,10 @@ def main(test_labels_dir, detect_labels_dir, plotfilepath):
         for cl, x, y, w, h, cf in t_bboxes:
             ious = []
             for cl2, x2, y2, w2, h2, cf2 in d_bboxes:
-                ious.append(bb_intersection_over_union([x, y, x+w, y+h], [x2, y2, x2+w2, y2+h2]))
+                if cl == cl2:
+                    ious.append(bb_intersection_over_union([x, y, x+w, y+h], [x2, y2, x2+w2, y2+h2]))
+                else:
+                    ious.append(0.0)
             accuracy = 0
             if ious!=[]:
                 accuracy = max(ious)
