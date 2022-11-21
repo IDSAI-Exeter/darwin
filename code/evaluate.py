@@ -119,7 +119,8 @@ print(bins_means)
 n = 0
 for m in bins_means:
     plt.bar(n, m, 0.1, edgecolor='black')
-    n+=0.1
+    n += 0.1
+
 plt.xlabel('area')
 plt.ylabel('avg iou accuracy')
 plt.show()

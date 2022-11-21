@@ -112,8 +112,13 @@ def main(test_labels_dir, detect_labels_dir, plotfilepath):
     y = sorted(y)
 
     plt.barh(x, width=y, label=x)
+    plt.xlim([0.0, 1.0])
     plt.xlabel('avg iou accuracy')
+    plt.tight_layout()
     plt.savefig(plotfilepath)
+    with open(plotfilepath.split('.png')[0] + '.json', 'w') as fp:
+        json.dump({'y': y, 'x': x}, fp)
+        print({'y': y, 'x': x})
 
 
 if __name__ == '__main__':
