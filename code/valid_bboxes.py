@@ -14,21 +14,27 @@ seasons = sorted(list(set([annot['annotation']['season'] for annot in json_data]
 discard = []
 keep = []
 
+cnt = 0
+
+# undo 'z'
+
 for season in seasons:
     data = [annot for annot in json_data if annot['annotation']['season'] == season ]
     locations = list(set([annot['annotation']['location'] for annot in data]))
 
     for location in locations:
-        print(season, location)
+        cnt += 1
+        print(cnt, season, location)
+
         location_bboxes = [annot for annot in data if annot['annotation']['location'] == location]
         #image = cv2.imread('../data/serengeti_bboxes/images/'+image_id + '.JPG')
         images = list(set([bbox['image_id'] for bbox in location_bboxes]))
 
         validated = False
+
         while not validated:
 
             for image_id in images:
-
                 image = cv2.imread('../data/serengeti_bboxes/images/'+image_id.split('/')[-1] + '.JPG')
                 bboxes = [bbox for bbox in location_bboxes if bbox['image_id'] == image_id]
 
@@ -58,3 +64,4 @@ for season in seasons:
 
         json.dump(discard, open('discard.json', 'w'))
         json.dump(keep, open('keep.json', 'w'))
+print(cnt)
