@@ -1,100 +1,105 @@
 import json
 import cv2
 
-json_data = None
-with open('../data/bbox_species.json') as json_file:
-    json_data = json.load(json_file)
-    json_file.close()
+def main():
 
-season = 'S5' #S06
-location = 'C11' #'G07'
+    json_data = None
+    with open('../data/bbox_species.json') as json_file:
+        json_data = json.load(json_file)
+        json_file.close()
 
-seasons = sorted(list(set([annot['annotation']['season'] for annot in json_data])))
+    season = 'S5' #S06
+    location = 'C11' #'G07'
 
-discard = []
-keep = []
+    seasons = sorted(list(set([annot['annotation']['season'] for annot in json_data])))
 
-cnt = 0
+    discard = []
+    keep = []
 
-# undo 'z'
+    cnt = 0
 
-bins = []
+    # undo 'z'
 
-for season in seasons:
-    data = [annot for annot in json_data if annot['annotation']['season'] == season ]
-    locations = list(set([annot['annotation']['location'] for annot in data]))
+    bins = []
 
-    for location in locations:
-        bins.append({'season': season, 'location': location})
+    for season in seasons:
+        data = [annot for annot in json_data if annot['annotation']['season'] == season ]
+        locations = list(set([annot['annotation']['location'] for annot in data]))
 
-
-seen = []
-
-while bins:
-    bin = bins[0]
-    bins = bins[1:]
-    season = bin['season']
-    location = bin['location']
-    seen.append({'season': season, 'location': location})
+        for location in locations:
+            bins.append({'season': season, 'location': location})
 
 
-    print(len(seen), len(bins), season, location)
+    seen = []
 
-    location_bboxes = [annot for annot in json_data if annot['annotation']['location'] == location and annot['annotation']['season'] == season]
-    #image = cv2.imread('../data/serengeti_bboxes/images/'+image_id + '.JPG')
-    images = list(set([bbox['image_id'] for bbox in location_bboxes]))
+    while bins:
+        bin = bins[0]
+        bins = bins[1:]
+        season = bin['season']
+        location = bin['location']
+        seen.append({'season': season, 'location': location})
 
-    validated = False
 
-    while not validated:
+        print(len(seen), '/', len(bins), season, location)
 
-        for image_id in images:
-            image = cv2.imread('../data/serengeti_bboxes/images/'+image_id.split('/')[-1] + '.JPG')
-            bboxes = [bbox for bbox in location_bboxes if bbox['image_id'] == image_id]
+        location_bboxes = [annot for annot in json_data if annot['annotation']['location'] == location and annot['annotation']['season'] == season]
+        #image = cv2.imread('../data/serengeti_bboxes/images/'+image_id + '.JPG')
+        images = list(set([bbox['image_id'] for bbox in location_bboxes]))
 
-            for bbox in bboxes:
-                x, y, w, h = bbox['bbox']
-                #image = cv2.imread('../data/serengeti_bboxes/images/'+bbox['image_id'].split('/')[-1] + '.JPG')
-                cv2.rectangle(image, (int(x), int(y)), (int(x+w), int(y+h)), (255, 255, 0), 3)
-            try:
-                cv2.imshow('image', image)
-            except:
-                continue
-                print('file error')
+        validated = False
 
-            key = cv2.waitKey(0)
-            print(key)
-            if key == 32:
-                continue
-            elif key == 107:
-                # keep
-                keep.append({'season': season, 'location': location})
-                validated = True
-                break
-            elif key == 100:
-                # discard
-                discard.append({'season': season, 'location': location})
-                validated = True
-                break
-            elif key == 122:
-                # undo
-                last = seen.pop()
-                last = seen.pop()
+        while not validated:
+
+            for image_id in images:
+                image = cv2.imread('../data/serengeti_bboxes/images/'+image_id.split('/')[-1] + '.JPG')
+                bboxes = [bbox for bbox in location_bboxes if bbox['image_id'] == image_id]
+
+                for bbox in bboxes:
+                    x, y, w, h = bbox['bbox']
+                    #image = cv2.imread('../data/serengeti_bboxes/images/'+bbox['image_id'].split('/')[-1] + '.JPG')
+                    cv2.rectangle(image, (int(x), int(y)), (int(x+w), int(y+h)), (255, 255, 0), 3)
                 try:
-                    discard.remove(last)
+                    cv2.imshow('image', image)
                 except:
-                    pass
-                try:
-                    keep.remove(last)
-                except:
-                    pass
-                bins = [last] + bins
-                validated = True
-                break
+                    continue
+                    print('file error')
 
-    print('keep', keep)
-    print('discard', discard)
+                key = cv2.waitKey(0)
+                # print(key)
+                if key == 32:
+                    continue
+                elif key == 107:
+                    # keep
+                    keep.append({'season': season, 'location': location})
+                    validated = True
+                    break
+                elif key == 100:
+                    # discard
+                    discard.append({'season': season, 'location': location})
+                    validated = True
+                    break
+                elif key == 122:
+                    # undo
+                    last = seen.pop()
+                    last = seen.pop()
+                    try:
+                        discard.remove(last)
+                    except:
+                        pass
+                    try:
+                        keep.remove(last)
+                    except:
+                        pass
+                    bins = [last] + bins
+                    validated = True
+                    break
 
-    json.dump(discard, open('discard.json', 'w'))
-    json.dump(keep, open('keep.json', 'w'))
+        #print('keep', keep)
+        #print('discard', discard)
 
+        json.dump(discard, open('discard.json', 'w'))
+        json.dump(keep, open('keep.json', 'w'))
+
+
+if __name__=='__main__':
+    main()
