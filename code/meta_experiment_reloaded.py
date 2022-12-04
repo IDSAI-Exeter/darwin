@@ -81,7 +81,8 @@ def main(experiment_dir):
     train_locations = [loc for loc in locations if loc not in test_locations]
 
     # Restrict to a few species?
-    selected_species = ['elephant', 'cheetah', 'giraffe']
+    #selected_species = ['elephant', 'cheetah', 'giraffe']
+    selected_species = ['giraffe']
 
     # select n images per species
 
