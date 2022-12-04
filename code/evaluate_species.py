@@ -35,7 +35,7 @@ def main(test_labels_dir, detect_labels_dir, plotfilepath):
 
     for file in test_labels_files:
         test_f = open(file).readlines()
-        bboxes =[]
+        bboxes = []
         for line in test_f:
             cl, x, y, w, h = line.split()
             bboxes.append([float(cl), float(x), float(y), float(w), float(h), 1.0])
@@ -69,6 +69,10 @@ def main(test_labels_dir, detect_labels_dir, plotfilepath):
 
     species_accuracy = {}
 
+    from collections import Counter
+    species_false_negative = Counter()
+    species_predictions = Counter()
+
     for k in test_labels_dic.keys():
         t_bboxes = test_labels_dic[k]
         d_bboxes = []
@@ -76,16 +80,29 @@ def main(test_labels_dir, detect_labels_dir, plotfilepath):
             d_bboxes = detect_labels_dic[k]
         except:
             pass
+
+        species_predictions[image_species[k]] += len(d_bboxes)
+        print(species_predictions[image_species[k]])
+
         for cl, x, y, w, h, cf in t_bboxes:
             ious = []
+            fn_iou = 0.0
             for cl2, x2, y2, w2, h2, cf2 in d_bboxes:
+                iou = bb_intersection_over_union([x, y, x+w, y+h], [x2, y2, x2+w2, y2+h2])
+                if iou != 0:
+                    fn_iou = iou
                 if cl == cl2:
-                    ious.append(bb_intersection_over_union([x, y, x+w, y+h], [x2, y2, x2+w2, y2+h2]))
+                    ious.append(iou)
                 else:
                     ious.append(0.0)
             accuracy = 0
-            if ious!=[]:
+
+            if fn_iou != 0.0:
+                species_false_negative[image_species[k]] += 1
+
+            if ious != []:
                 accuracy = max(ious)
+
             bboxes_accuracy.append(accuracy)
             areas.append(w*h)
             import math
@@ -104,9 +121,15 @@ def main(test_labels_dir, detect_labels_dir, plotfilepath):
     z = []
 
     for k in species_accuracy.keys():
-        x.append(k)
-        y.append(mean(species_accuracy[k]))
-        z.append(len(species_accuracy[k]))
+        #y.append(mean(species_accuracy[k]))
+        print(k, species_accuracy[k], species_predictions[k], species_false_negative[k])
+        try:
+            iou_accuracy = sum(species_accuracy[k])/(species_predictions[k]+species_false_negative[k])
+            x.append(k)
+            y.append(iou_accuracy)
+            z.append(len(species_accuracy[k]))
+        except:
+            pass
 
     x = [e for _, e in sorted(zip(y, x))]
     y = sorted(y)

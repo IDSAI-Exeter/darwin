@@ -11,13 +11,13 @@ dataset_dir = "../data/serengeti_bboxes/"
 
 #experiment_dir = "../data/experiments/sample/"
 
-experiment_dir = "../data/experiments/sample_uniform_elephant_cheetah_giraffe/"
+#experiment_dir = "../data/experiments/sample_uniform_elephant_cheetah_giraffe/"
 
 discard_file = "../data/discard.json"
 
 species_bbox_file = '../data/bbox_species.json'
 
-def main():
+def main(experiment_dir):
     try:
         os.mkdir("../data/experiments")
     except:
@@ -170,6 +170,9 @@ def main():
     #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
     #     os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
+    with open(experiment_dir + "test_locations.json", 'w') as json_file:
+        json.dump(test_locations, json_file)
+
     with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
         yaml_file.write("path: ../%s\n"%experiment_dir)
         yaml_file.write("train: train/images/\n")
@@ -181,5 +184,26 @@ def main():
             yaml_file.write("   %i: %s\n"%(v,k))
         yaml_file.close()
 
-if __name__ == "__main__":
-    main()
+    print("next download empty images")
+
+if __name__=="__main__":
+    import sys, getopt
+
+    experiment_dir = ''
+    argv = sys.argv[1:]
+
+    try:
+        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+    except getopt.GetoptError:
+        print('script.py -e <experiment_dir>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('test.py -e <experiment_dir>')
+            sys.exit()
+        elif opt in ("-e", "--experiment_dir"):
+            experiment_dir = arg
+
+    if not experiment_dir[-1] == '/':
+        experiment_dir += '/'
+    main(experiment_dir)

@@ -101,5 +101,5 @@ def main():
         json.dump(keep, open('keep.json', 'w'))
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
