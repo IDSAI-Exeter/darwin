@@ -190,16 +190,16 @@ def main(experiment_dir):
         yaml_file.close()
 
     with open(experiment_dir + "sbatch_train.sh", 'w') as file:
-        file.write("# !/bin/bash\n")
-        file.write("# SBATCH --partition=small\n")
-        file.write("# SBATCH --nodes=1\n")
-        file.write("# SBATCH --gres=gpu:1\n")
-        file.write("# SBATCH --mail-type=ALL\n")
-        file.write("# SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+        file.write("#!/bin/bash\n")
+        file.write("#SBATCH --partition=small\n")
+        file.write("#SBATCH --nodes=1\n")
+        file.write("#SBATCH --gres=gpu:1\n")
+        file.write("#SBATCH --mail-type=ALL\n")
+        file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
         file.write("source ../../../../../.profile\n")
         file.write("source ../../../darwin_venv/bin/activate\n")
         file.write("echo 'training on trainset'\n")
-        file.write("python3 ../../../lib/yolov5/train.py --data train.yaml --project train/runs/ --name train - -batch 16\n")
+        file.write("python3 ../../../lib/yolov5/train.py --data train.yaml --project train/runs/ --name train --batch 16\n")
         file.write("\n")
         file.close()
 

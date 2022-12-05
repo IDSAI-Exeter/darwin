@@ -54,6 +54,9 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
         json_data = json.load(json_file)
         json_file.close()
 
+    species_file = '../data/serengeti_bboxes/species_classes.json'
+    species_classes = json.load(open(species_file))
+
     from collections import defaultdict
     species_segments = defaultdict(list)
 
@@ -69,7 +72,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
         #for bbox in bboxes:
         # restrict to images with only one bbod
-        if True: #len(bboxes) == 1:
+        if len(bboxes) == 1:
             bbox = bboxes[0]
             x, y, w, h = bbox['bbox']
 
@@ -207,6 +210,31 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
                     # cv2.imshow('augment', l_img)
                     # cv2.waitKey(0)
                     j += 1
+
+    with open(experiment_dir + "augment_%i.yaml"%n_augment, 'w') as yaml_file:
+        yaml_file.write("path: ../%s\n"%experiment_dir)
+        yaml_file.write("train: augment_%i/images/\n"%n_augment)
+        yaml_file.write("test: test/images/\n")
+        yaml_file.write("val: test/images/\n")
+        yaml_file.write("\n")
+        yaml_file.write("names:\n")
+        for k, v in species_classes.items():
+            yaml_file.write("   %i: %s\n"%(v,k))
+        yaml_file.close()
+
+    with open(experiment_dir + "sbatch_augment_%i.sh"%n_augment, 'w') as file:
+        file.write("#!/bin/bash\n")
+        file.write("#SBATCH --partition=small\n")
+        file.write("#SBATCH --nodes=1\n")
+        file.write("#SBATCH --gres=gpu:1\n")
+        file.write("#SBATCH --mail-type=ALL\n")
+        file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+        file.write("source ../../../../../.profile\n")
+        file.write("source ../../../darwin_venv/bin/activate\n")
+        file.write("echo 'training on %i augmented trainset'\n"%n_augment)
+        file.write("python3 ../../../lib/yolov5/train.py --data augment_%i.yaml --project augment_%i/runs/ --name augment --batch 16\n"%(n_augment, n_augment))
+        file.write("\n")
+        file.close()
 
 if __name__ == '__main__':
     import sys, getopt
