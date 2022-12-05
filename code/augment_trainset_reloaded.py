@@ -9,28 +9,33 @@ from scipy import ndimage
 import random
 import json
 from rembg import remove
+from PIL import Image
+import numpy as np
+
 
 def flatten(l):
     return [item for sublist in l for item in sublist]
 
-def main(train_dir, empty_imgs_dir, augmented_dir):
+def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
-    print(train_dir, empty_imgs_dir)
+    print(experiment_dir, empty_imgs_dir)
     i = 0
     #training_set = os.listdir(train_dir)
 
-    train_files = glob.glob(train_dir + '/train' + '/images/*.JPG')
-    train_labels = glob.glob(train_dir + '/train' + '/labels/*.txt')
+    train_files = glob.glob(experiment_dir + 'train' + '/images/*.JPG')
+    train_labels = glob.glob(experiment_dir + 'train' + '/labels/*.txt')
     empty_images = glob.glob(empty_imgs_dir + '*.JPG')
 
     try:
         os.mkdir(augmented_dir)
-        os.mkdir(augmented_dir + '/images')
-        os.mkdir(augmented_dir + '/labels')
+        os.mkdir(augmented_dir + 'images')
+        os.mkdir(augmented_dir + 'labels')
     except:
         pass
 
     # cp -r train augmented
+    os.system("cp %s %s"%(experiment_dir + '/train' + '/images/*.JPG', augmented_dir + '/images/'))
+    os.system("cp %s %s"%(experiment_dir + '/train' + '/labels/*.txt', augmented_dir + '/labels/'))
 
     # animal_dir = '../data/animals/'
     # animal_image = cv2.imread(animals[15])
@@ -39,7 +44,7 @@ def main(train_dir, empty_imgs_dir, augmented_dir):
     import yaml
     classes = {}
 
-    with open(train_dir + '/experiment.yaml') as f:
+    with open(experiment_dir + '/experiment.yaml') as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
         classes = {v: k for k, v in data['names'].items()}
 
@@ -64,15 +69,16 @@ def main(train_dir, empty_imgs_dir, augmented_dir):
 
         #for bbox in bboxes:
         # restrict to images with only one bbod
-        if len(bboxes) == 1:
+        if True: #len(bboxes) == 1:
             bbox = bboxes[0]
             x, y, w, h = bbox['bbox']
 
-            r = 0.1
+            r = 0.05
 
             bx, by, bw, bh = x - w*r, y - h*r, w + w*2*r, h + h*2*r
             #if x > 50 and y > 50 and x+w < bbox['image']['width'] - 50 and y+h < bbox['image']['height'] - 50:
-            if bx > 50 and by > 50 and bx + bw < bbox['image']['width'] - 50 and by + bh < bbox['image']['height'] - 50:
+            #if bx > 50 and by > 50 and bx + bw < bbox['image']['width'] - 50 and by + bh < bbox['image']['height'] - 50:
+            if bx > 0 and by > 0 and bx + bw < bbox['image']['width'] and by + bh < bbox['image']['height'] - 200:
                 image = cv2.imread(train_file)
                 #cv2.rectangle(image, (int(x), int(y)), (int(x+w), int(y+h)), (255, 0, 0), 3)
 
@@ -112,16 +118,16 @@ def main(train_dir, empty_imgs_dir, augmented_dir):
 
                     species_segments[bbox['species']].append({'segment': animal_image})
 
-
     # after browsing training files
-
-    n_augment = 1000
+    # read from input now n_augment = 1000
 
     for k in species_segments.keys():
         n_segments = len(species_segments[k])
 
         max_augmented = int(n_augment / n_segments)
-        print(max_augmented)
+        if not max_augmented:
+            max_augmented = 1
+        print(k, n_segments, n_augment, max_augmented)
         i += 1
         j = 0
         for segment in species_segments[k]:
@@ -151,6 +157,13 @@ def main(train_dir, empty_imgs_dir, augmented_dir):
                 angle = random.randint(-30, 30)
 
                 s_img = ndimage.rotate(s_img, angle)
+
+                pil_image = Image.fromarray(s_img)
+                imageBox = pil_image.getbbox()
+                pil_image = pil_image.crop(imageBox)
+                nimg = np.array(pil_image)
+                ocvim = cv2.cvtColor(nimg, cv2.COLOR_RGBA2BGRA)  # cv::COLOR_RGBA2BGRA
+                s_img = ocvim
 
                 if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0 ):
                     x_offset = random.randint(0, l_img.shape[1] - s_img.shape[1])
@@ -198,25 +211,26 @@ def main(train_dir, empty_imgs_dir, augmented_dir):
 if __name__ == '__main__':
     import sys, getopt
 
-    train_dir = ''
-    empty_imgs_dir = ''
-    augmented_dir = ''
+    experiment_dir = ''
     argv = sys.argv[1:]
+    n_augment = 0
 
     try:
-        opts, args = getopt.getopt(argv, "ht:e:a:", ["traindir=", "emptyimgsdir=", "augmenteddir"])
+        opts, args = getopt.getopt(argv, "he:i:", ["experiment_dir=", "n_images"])
     except getopt.GetoptError:
-        print('test.py -t <traindir> -e <emptyimgsdir> -a <augmenteddir>')
+        print('script.py -e <experiment_dir> -i <n_images>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('test.py -t <traindir> -e <emptyimgsdir> -a <augmenteddir>')
+            print('script.py -e <experiment_dir> -i <n_images>')
             sys.exit()
-        elif opt in ("-t", "--traindir"):
-            train_dir = arg
-        elif opt in ("-e", "--emptyimgsdir"):
-            empty_imgs_dir = arg
-        elif opt in ("-a", "--augmenteddir"):
-            augmented_dir = arg
+        elif opt in ("-e", "--experiment_dir"):
+            experiment_dir = arg
+        elif opt in ("-i", "--n_images"):
+            n_augment = int(arg)
+    if not experiment_dir[-1] == '/':
+        experiment_dir += '/'
 
-    main(train_dir, empty_imgs_dir, augmented_dir)
+    empty_imgs_dir = experiment_dir + 'empty/'
+    augmented_dir = experiment_dir + 'augment_' + str(n_augment) + '/'
+    main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment)

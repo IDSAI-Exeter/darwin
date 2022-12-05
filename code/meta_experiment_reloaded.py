@@ -33,6 +33,10 @@ def main(experiment_dir):
             os.mkdir(experiment_dir + d + 'labels')
         except:
             pass
+    try:
+        os.mkdir(experiment_dir + 'train/runs/')
+    except:
+        pass
 
     bbox_data = None
     with open(species_bbox_file) as json_file:
@@ -174,7 +178,7 @@ def main(experiment_dir):
     with open(experiment_dir + "test_locations.json", 'w') as json_file:
         json.dump(test_locations, json_file)
 
-    with open(experiment_dir + "experiment.yaml",'w') as yaml_file:
+    with open(experiment_dir + "train.yaml", 'w') as yaml_file:
         yaml_file.write("path: ../%s\n"%experiment_dir)
         yaml_file.write("train: train/images/\n")
         yaml_file.write("test: test/images/\n")
@@ -184,6 +188,20 @@ def main(experiment_dir):
         for k, v in species_classes.items():
             yaml_file.write("   %i: %s\n"%(v,k))
         yaml_file.close()
+
+    with open(experiment_dir + "sbatch_train.sh", 'w') as file:
+        file.write("# !/bin/bash\n")
+        file.write("# SBATCH --partition=small\n")
+        file.write("# SBATCH --nodes=1\n")
+        file.write("# SBATCH --gres=gpu:1\n")
+        file.write("# SBATCH --mail-type=ALL\n")
+        file.write("# SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+        file.write("source ../../../../../.profile\n")
+        file.write("source ../../../darwin_venv/bin/activate\n")
+        file.write("echo 'training on trainset'\n")
+        file.write("python3 ../../../lib/yolov5/train.py --data train.yaml --project train/runs/ --name train - -batch 16\n")
+        file.write("\n")
+        file.close()
 
     print("next download empty images")
 
