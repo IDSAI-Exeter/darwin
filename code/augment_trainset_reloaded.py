@@ -44,7 +44,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
     import yaml
     classes = {}
 
-    with open(experiment_dir + '/experiment.yaml') as f:
+    with open(experiment_dir + 'train.yaml') as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
         classes = {v: k for k, v in data['names'].items()}
 
@@ -56,6 +56,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
     species_file = '../data/serengeti_bboxes/species_classes.json'
     species_classes = json.load(open(species_file))
+    #species_classes = classes
 
     from collections import defaultdict
     species_segments = defaultdict(list)
