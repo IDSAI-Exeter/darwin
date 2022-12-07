@@ -229,5 +229,5 @@ if __name__ == "__main__":
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
-    main(experiment_dir)
+    main(experiment_dir, n_images)
 
