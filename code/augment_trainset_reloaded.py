@@ -73,7 +73,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
         #for bbox in bboxes:
         # restrict to images with only one bbod
-        if len(bboxes) == 1:
+        if True: #len(bboxes) == 1:
             bbox = bboxes[0]
             x, y, w, h = bbox['bbox']
 
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     n_augment = 0
 
     try:
-        opts, args = getopt.getopt(argv, "he:i:", ["experiment_dir=", "n_images"])
+        opts, args = getopt.getopt(argv, "he:i:", ["experiment_dir=", "n_images="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir> -i <n_images>')
         sys.exit(2)

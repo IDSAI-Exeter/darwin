@@ -17,7 +17,7 @@ discard_file = "../data/discard.json"
 
 species_bbox_file = '../data/bbox_species.json'
 
-def main(experiment_dir):
+def main(experiment_dir, n_images):
     try:
         os.mkdir("../data/experiments")
     except:
@@ -89,8 +89,8 @@ def main(experiment_dir):
     selected_species = ['giraffe']
 
     # select n images per species
-
-    n_images = 1000
+    # taken as input
+    # n_images = 1000
 
     for sp in selected_species:
         individuals = [bbox for bbox in bbox_data if bbox['annotation']['location'] in train_locations and bbox['species'] == sp]
@@ -205,24 +205,29 @@ def main(experiment_dir):
 
     print("next download empty images")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     import sys, getopt
 
     experiment_dir = ''
+    n_images = 0
     argv = sys.argv[1:]
 
     try:
-        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+        opts, args = getopt.getopt(argv, "he:i:", ["experiment_dir=", "n_images="])
     except getopt.GetoptError:
-        print('script.py -e <experiment_dir>')
+        print('script.py -e <experiment_dir> -i <n_images>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('test.py -e <experiment_dir>')
+            print('script.py -e <experiment_dir> -i <n_images>')
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
+        elif opt in ("-i", "--n_images"):
+            n_images = int(arg)
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
     main(experiment_dir)
+
