@@ -17,7 +17,8 @@ discard_file = "../data/discard.json"
 
 species_bbox_file = '../data/bbox_species.json'
 
-def main(experiment_dir, n_images):
+
+def main(experiment_dir, n_images, selected_species):
     try:
         os.mkdir("../data/experiments")
     except:
@@ -53,7 +54,6 @@ def main(experiment_dir, n_images):
 
     # get species list
     species = list(set([bbox['species'] for bbox in bbox_data]))
-
     species.remove('empty')
     species.remove('human')
 
@@ -85,7 +85,7 @@ def main(experiment_dir, n_images):
     train_locations = [loc for loc in locations if loc not in test_locations]
 
     # Restrict to a few species?
-    selected_species = ['elephant', 'wildebeest', 'giraffe']
+    #selected_species = ['elephant', 'wildebeest', 'giraffe']
     #selected_species = ['giraffe']
 
     # select n images per species
@@ -212,22 +212,25 @@ if __name__ == "__main__":
     experiment_dir = ''
     n_images = 0
     argv = sys.argv[1:]
+    species = []
 
     try:
-        opts, args = getopt.getopt(argv, "he:i:", ["experiment_dir=", "n_images="])
+        opts, args = getopt.getopt(argv, "he:i:s:", ["experiment_dir=", "n_images=", "species="])
     except getopt.GetoptError:
-        print('script.py -e <experiment_dir> -i <n_images>')
+        print('script.py -e <experiment_dir> -i <n_images> -s <species>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('script.py -e <experiment_dir> -i <n_images>')
+            print('script.py -e <experiment_dir> -i <n_images> -s <species>')
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
         elif opt in ("-i", "--n_images"):
             n_images = int(arg)
+        elif opt in ("-s", "--species"):
+            species = [s.strip().lower() for s in arg.split(',')]
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
-    main(experiment_dir, n_images)
+    main(experiment_dir, n_images, species)
 
