@@ -11,3 +11,8 @@ pip3 install rembg
 mkdir data;mkdir data/experiments;mkdir data/runs
 mkdir data/animals
 pip3 install pandas
+cd lib
+wget https://aka.ms/downloadazcopy-v10-linux
+tar -xvf downloadazcopy-v10-linux
+mv azcopy_linux_amd64_10.16.2 azcopy
+cd ../

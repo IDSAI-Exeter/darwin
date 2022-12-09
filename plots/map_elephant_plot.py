@@ -1,10 +1,10 @@
-# import os
-#
-# l = ["projects/darwin/data/experiments/elephant/train/runs/train/results.csv"]
-# l += ["projects/darwin/data/experiments/elephant/augment_%i/runs/augment/results.csv"%i for i in [500, 1000, 2000, 4000, 8000]]
-#
-# for f, s in zip(l, [0, 500, 1000, 2000, 4000, 8000]):
-#     os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/%i.csv"%(f,s))
+import os
+
+l = ["projects/darwin/data/experiments/elephant/train/runs/train/results.csv"]
+l += ["projects/darwin/data/experiments/elephant/augment_%i/runs/augment/results.csv"%i for i in [500, 1000, 2000, 4000, 8000]]
+
+for f, s in zip(l, [0, 500, 1000, 2000, 4000, 8000]):
+    os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/%i.csv"%(f,s))
 
 import pandas as pd
 
