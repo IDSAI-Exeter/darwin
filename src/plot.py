@@ -1,20 +1,20 @@
 # TBC
+import os
+
 
 def main(experiment_dir, n_augment):
 
     k = 4
 
+    l = []
+
     for i in range(1, k+1):
-        experiment_dir + "fold_%i"%(n_augment+i)
-
-    import os
-
-    l = [('t', "projects/darwin/data/experiments/eg_%i/train/runs/train/results.csv"%i, i) for i in [100, 500, 1000]]
-    l += [('a', "projects/darwin/data/experiments/eg_%i/augment_200/runs/augment/results.csv"%i, i) for i in [100, 500, 1000]]
+        print(experiment_dir + "fold_%i"%(n_augment+i))
+        l += [('t', "%sfold_%i/train/runs/train/results.csv"%(experiment_dir, 100+i), 100+i)]
+        l += [('a', "%sfold_%i/augment_%i/runs/augment/results.csv"%(experiment_dir, 100+i, n_augment), 100+i)]
 
     for t, f, i in l:
         os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/eg_%s_%i.csv"%(f, t, i))
-
 
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -23,9 +23,11 @@ def main(experiment_dir, n_augment):
     i_ = [100, 500, 1000]
 
     for i in i_:
-        dfs.append(('raw_', pd.read_csv("csv/eg_t_%i.csv"%i), i))
-        dfs.append(('aug_', pd.read_csv("csv/eg_a_%i.csv"%i), i))
-
+        try:
+            dfs.append(('raw_', pd.read_csv("csv/eg_t_%i.csv"%i), i))
+            dfs.append(('aug_', pd.read_csv("csv/eg_a_%i.csv"%i), i))
+        except:
+            pass
 
     def cs(secs, df):
         ts = [secs]*len(df)
@@ -34,6 +36,7 @@ def main(experiment_dir, n_augment):
         cs = list(cs)
         return cs
 
+    # Proper values to be read from log files.
 
     dfs[0][1]['cumtime'] = cs(11, dfs[0][1])  # 100 raw
     dfs[1][1]['cumtime'] = cs(441, dfs[1][1])  # 100 aug
@@ -47,7 +50,7 @@ def main(experiment_dir, n_augment):
     fig, ax = plt.subplots()
     for t, df, i in dfs:
         df[t+str(i)] = df['metrics/mAP_0.5:0.95']
-        df.plot(ax=ax, x='cumtime', y=t+str(i), legend=True, title='Elephant-Giraffe detection augmented with 1000 images')
+        df.plot(ax=ax, x='cumtime', y=t+str(i), legend=True, title='Elephant-Giraffe detection augmented with %i images'%n_augment)
         print(df.columns)
     plt.ylabel('metrics/mAP_0.5:0.95')
     plt.xlabel('time(s)')
@@ -56,8 +59,11 @@ def main(experiment_dir, n_augment):
     fig, ax = plt.subplots()
     for t, df, i in dfs:
         df[t+str(i)] = df['metrics/mAP_0.5:0.95']
-        df[t+str(i)].plot(legend=True, title='Elephant-Giraffe detection augmented with 1000 images')
+        df[t+str(i)].plot(legend=True, title='Elephant-Giraffe detection augmented with %i images'%n_augment)
     plt.xlabel('epochs')
     plt.ylabel('metrics/mAP_0.5:0.95')
     fig.savefig('eg_epochs.png')
 
+
+if __name__ == "__main__":
+    main('projects/darwin/data/experiments/ewg/', 200)
