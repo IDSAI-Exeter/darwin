@@ -1,3 +1,5 @@
+# UNKNOWN BEHAVIOR
+
 def bb_intersection_over_union(boxA, boxB):
     # determine the (x, y)-coordinates of the intersection rectangle
     xA = max(boxA[0], boxB[0])
@@ -89,6 +91,7 @@ def main(test_labels_dir, detect_labels_dir, discardfilepath):
                 discarded.append(k)
 
     json.dump(open(discardfilepath, 'w'), list(set(discarded)))
+
 
 if __name__ == '__main__':
     import sys, getopt
