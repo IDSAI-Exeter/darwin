@@ -1,6 +1,11 @@
 # TBC
 
-def main(experiment_dir):
+def main(experiment_dir, n_augment):
+
+    k = 4
+
+    for i in range(1, k+1):
+        experiment_dir + "fold_%i"%(n_augment+i)
 
     import os
 
