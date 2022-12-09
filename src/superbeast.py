@@ -2,7 +2,7 @@ import os
 
 def run(command):
     print("\t" + command)
-    #os.system(command)
+    os.system(command)
 
 
 def main(experiment_dir, species, n_augment):
