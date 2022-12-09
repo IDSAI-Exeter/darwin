@@ -233,9 +233,10 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
         file.write("source ../../../../../.profile\n")
         file.write("source ../../../darwin_venv/bin/activate\n")
         file.write("echo 'training on %i augmented trainset'\n"%n_augment)
-        file.write("python3 ../../../lib/yolov5/train.py --epochs 1000 --data augment_%i.yaml --project augment_%i/runs/ --name augment --batch 16\n"%(n_augment, n_augment))
+        file.write("python3 ../../../../lib/yolov5/train.py --epochs 1000 --data augment_%i.yaml --project augment_%i/runs/ --name augment --batch 16\n"%(n_augment, n_augment))
         file.write("\n")
         file.close()
+
 
 if __name__ == '__main__':
     import sys, getopt
