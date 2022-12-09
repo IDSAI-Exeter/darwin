@@ -18,8 +18,9 @@ def main(experiment_dir, species):
     except:
         pass
 
-    for i in [100]:
-        fold_dir = experiment_dir + "fold_%i"%i
+    for i, f in [(100, f) for f in range(1, k+1)]:
+
+        fold_dir = experiment_dir + "fold_%i"%(i+f)
 
         try:
             os.mkdir(fold_dir)
@@ -29,7 +30,6 @@ def main(experiment_dir, species):
         run("python3 meta_experiment_reloaded.py -e %s --n_images=%i --species=%s"%(fold_dir, i, ','.join(species)))
         run("python3 download_empty_reloaded.py -e %s"%fold_dir)
         run("python3 augment_trainset_reloaded.py -e %s -i %i"%(fold_dir, j))
-
         run("cd %s; sbatch sbatch_train.sh; sbatch sbatch_augment_%i.sh; cd -;"%(fold_dir, i))
 
 
