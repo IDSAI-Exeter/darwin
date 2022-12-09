@@ -2,19 +2,35 @@ import os
 
 def run(command):
     print("\t" + command)
-    os.system(command)
+    #os.system(command)
+
 
 def main(experiment_dir, species):
-    # K-FOLD
+
     k = 4
+
     print("\nGenerating %i FOLD experiment in %s for the following species :\n\t%s\n"%(k, experiment_dir, ', '.join(species)))
 
-    j = 2000
+    j = 1000
+
+    try:
+        os.mkdir(experiment_dir)
+    except:
+        pass
 
     for i in [100]:
-        run("python3 meta_experiment_reloaded.py -e %s --n_images=%i --species=%s"%(experiment_dir, i, ','.join(species)))
-        run("python3 download_empty_reloaded.py -e %s"%experiment_dir)
-        run("python3 augment_trainset_reloaded.py -e %s -i %i"%(experiment_dir, j))
+        fold_dir = experiment_dir + "fold_%i"%i
+
+        try:
+            os.mkdir(fold_dir)
+        except:
+            pass
+
+        run("python3 meta_experiment_reloaded.py -e %s --n_images=%i --species=%s"%(fold_dir, i, ','.join(species)))
+        run("python3 download_empty_reloaded.py -e %s"%fold_dir)
+        run("python3 augment_trainset_reloaded.py -e %s -i %i"%(fold_dir, j))
+
+        run("cd %s; sbatch sbatch_train.sh; sbatch sbatch_augment_%i.sh; cd -;"%(fold_dir, i))
 
 
 if __name__ == "__main__":
