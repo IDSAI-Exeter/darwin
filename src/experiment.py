@@ -196,10 +196,10 @@ def main(experiment_dir, n_images, selected_species):
         file.write("#SBATCH --gres=gpu:1\n")
         file.write("#SBATCH --mail-type=ALL\n")
         file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
-        file.write("source ../../../../../.profile\n")
-        file.write("source ../../../darwin_venv/bin/activate\n")
+        file.write("source ../../../../../../../.profile\n")
+        file.write("source ../../../../../darwin_venv/bin/activate\n")
         file.write("echo 'training on trainset'\n")
-        file.write("python3 ../../../lib/yolov5/train.py --data train.yaml --project train/runs/ --name train --batch 16\n")
+        file.write("python3 ../../../../../lib/yolov5/train.py --epochs 10000--data train.yaml --project train/runs/ --name train --batch 16\n")
         file.write("\n")
         file.close()
 

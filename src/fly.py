@@ -56,7 +56,7 @@ def main(experiment_dir, n_augment):
     fig, ax = plt.subplots()
     for t, df, i in dfs:
         df[t+str(i)] = df['metrics/mAP_0.5:0.95']
-        df.plot(ax=ax, x='cumtime', y=t+str(i), legend=True, title='Superbeast 101 detection augmented with %i images'%n_augment)
+        df.plot(ax=ax, x='cumtime', y=t+str(i), legend=True, title='Superbeast 101 augmented with %i images per species'%n_augment)
         print(df.columns)
     plt.ylabel('metrics/mAP_0.5:0.95')
     plt.xlabel('time(s)')
@@ -65,7 +65,7 @@ def main(experiment_dir, n_augment):
     fig, ax = plt.subplots()
     for t, df, i in dfs:
         df[t+str(i)] = df['metrics/mAP_0.5:0.95']
-        df[t+str(i)].plot(legend=True, title='Superbeast 101 detection augmented with %i images'%n_augment)
+        df[t+str(i)].plot(legend=True, title='Superbeast 101 augmented with %i images per species'%n_augment)
     plt.xlabel('epochs')
     plt.ylabel('metrics/mAP_0.5:0.95')
     fig.savefig('eg_epochs.png')
