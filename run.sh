@@ -1,3 +1,3 @@
-source darwin_env/bin/activate/
+source darwin_venv/bin/activate/
 cd src/
-python3 superbeast.py -e <dir> -s <species_list> -n <n_augment>
+python3 superbeast.py -e ../data/experiments/test -s lionmale,gazellethomsons -n 100
