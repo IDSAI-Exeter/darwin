@@ -16,6 +16,14 @@ import numpy as np
 def flatten(l):
     return [item for sublist in l for item in sublist]
 
+def tighten_to_visible(img):
+    pil_image = Image.fromarray(img)
+    imageBox = pil_image.getbbox()
+    pil_image = pil_image.crop(imageBox)
+    nimg = np.array(pil_image)
+    ocvim = cv2.cvtColor(nimg, cv2.COLOR_RGB2BGRA)  # cv::COLOR_RGBA2BGRA
+    return ocvim
+
 def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
     print(experiment_dir, empty_imgs_dir)
@@ -72,7 +80,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
         bboxes = [annot for annot in json_data if annot['image_id'].split('/')[-1] == image_id]
 
         #for bbox in bboxes:
-        # restrict to images with only one bbod
+        # restrict to images with only one bbox, cancelled
         if True: #len(bboxes) == 1:
             bbox = bboxes[0]
             x, y, w, h = bbox['bbox']
@@ -162,12 +170,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
                 s_img = ndimage.rotate(s_img, angle)
 
-                pil_image = Image.fromarray(s_img)
-                imageBox = pil_image.getbbox()
-                pil_image = pil_image.crop(imageBox)
-                nimg = np.array(pil_image)
-                ocvim = cv2.cvtColor(nimg, cv2.COLOR_RGBA2BGRA)  # cv::COLOR_RGBA2BGRA
-                s_img = ocvim
+                s_img = tighten_to_visible(s_img)
 
                 if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0 ):
                     x_offset = random.randint(0, l_img.shape[1] - s_img.shape[1])
