@@ -41,7 +41,7 @@ def main(experiment_dir, n_augment, timestamps):
     dfs[0][1]['cumtime'] = cs(timestamps[0], dfs[0][1])  # 100 raw
     dfs[1][1]['cumtime'] = cs(timestamps[1], dfs[1][1])  # 100 aug
 
-    try:
+    # try:
     dfs[2][1]['cumtime'] = cs(timestamps[2], dfs[2][1])  # 500 raw
     dfs[3][1]['cumtime'] = cs(timestamps[3], dfs[3][1])  # 500 aug
 
@@ -50,8 +50,8 @@ def main(experiment_dir, n_augment, timestamps):
 
     dfs[6][1]['cumtime'] = cs(timestamps[6], dfs[6][1])  # 1000 raw
     dfs[7][1]['cumtime'] = cs(timestamps[7], dfs[7][1])  # 1000 aug
-     except:
-         pass
+     # except:
+     #     pass
 
     fig, ax = plt.subplots()
     for t, df, i in dfs:
@@ -60,7 +60,7 @@ def main(experiment_dir, n_augment, timestamps):
         print(df.columns)
     plt.ylabel('metrics/mAP_0.5:0.95')
     plt.xlabel('time(s)')
-    fig.savefig('eg_time.png')
+    fig.savefig('time.png')
 
     fig, ax = plt.subplots()
     for t, df, i in dfs:
@@ -68,11 +68,12 @@ def main(experiment_dir, n_augment, timestamps):
         df[t+str(i)].plot(legend=True, title='Superbeast 101 augmented with %i images per species'%n_augment)
     plt.xlabel('epochs')
     plt.ylabel('metrics/mAP_0.5:0.95')
-    fig.savefig('eg_epochs.png')
+    fig.savefig('epochs.png')
 
 
 if __name__ == "__main__":
     #timestamps = [13, 141, 134, 16, 108, 25, 111]
     #main('projects/darwin/data/experiments/ewg/', 200, timestamps)
     timestamps = [13*60+8, 33*60+7, 134, 16, 108, 25, 111]
-    main('projects/darwin/data/experiments/all/', 100)
+    main('projects/darwin/data/experiments/all/', 100, timestamps)
+    os.system("mv epochs.png time.png ../plots/")
