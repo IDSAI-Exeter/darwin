@@ -113,7 +113,7 @@ def main(experiment_dir, n_images, selected_species):
             continue
 
         #while i/n < train_ratio: #0.01:
-        while i < n_images:
+        while i < n_images and shuffled:
             train_set.append(shuffled[0])
             i += counts[shuffled[0]]
             shuffled = shuffled[1:]
