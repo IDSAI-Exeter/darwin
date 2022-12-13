@@ -74,5 +74,5 @@ def main(experiment_dir, n_augment, timestamps):
 if __name__ == "__main__":
     #timestamps = [13, 141, 134, 16, 108, 25, 111]
     #main('projects/darwin/data/experiments/ewg/', 200, timestamps)
-    timestamps = [13*60+8, 141, 134, 16, 108, 25, 111]
+    timestamps = [13*60+8, 33*60+7, 134, 16, 108, 25, 111]
     main('projects/darwin/data/experiments/all/', 100)
