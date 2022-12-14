@@ -15,6 +15,7 @@ def main(experiment_dir, n_augment, timestamps):
 
     for t, f, i in l:
         os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
+        print("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
 
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -45,16 +46,16 @@ def main(experiment_dir, n_augment, timestamps):
     dfs[2][1]['cumtime'] = cs(timestamps[2], dfs[2][1])  # 500 raw
     dfs[3][1]['cumtime'] = cs(timestamps[3], dfs[3][1])  # 500 aug
 
-    dfs[4][1]['cumtime'] = cs(timestamps[4], dfs[4][1])  # 1000 raw
-    dfs[5][1]['cumtime'] = cs(timestamps[5], dfs[5][1])  # 1000 aug
+    # dfs[4][1]['cumtime'] = cs(timestamps[4], dfs[4][1])  # 1000 raw
+    # dfs[5][1]['cumtime'] = cs(timestamps[5], dfs[5][1])  # 1000 aug
 
-    dfs[6][1]['cumtime'] = cs(timestamps[6], dfs[6][1])  # 1000 raw
-    dfs[7][1]['cumtime'] = cs(timestamps[7], dfs[7][1])  # 1000 aug
+    # dfs[6][1]['cumtime'] = cs(timestamps[6], dfs[6][1])  # 1000 raw
+    # dfs[7][1]['cumtime'] = cs(timestamps[7], dfs[7][1])  # 1000 aug
      # except:
      #     pass
 
     fig, ax = plt.subplots()
-    for t, df, i in dfs:
+    for t, df, i in dfs[:4]:
         df[t+str(i)] = df['metrics/mAP_0.5:0.95']
         df.plot(ax=ax, x='cumtime', y=t+str(i), legend=True, title='Superbeast 101 augmented with %i images per species'%n_augment)
         print(df.columns)
@@ -63,7 +64,7 @@ def main(experiment_dir, n_augment, timestamps):
     fig.savefig('time.png')
 
     fig, ax = plt.subplots()
-    for t, df, i in dfs:
+    for t, df, i in dfs[:4]:
         df[t+str(i)] = df['metrics/mAP_0.5:0.95']
         df[t+str(i)].plot(legend=True, title='Superbeast 101 augmented with %i images per species'%n_augment)
     plt.xlabel('epochs')
@@ -74,6 +75,6 @@ def main(experiment_dir, n_augment, timestamps):
 if __name__ == "__main__":
     #timestamps = [13, 141, 134, 16, 108, 25, 111]
     #main('projects/darwin/data/experiments/ewg/', 200, timestamps)
-    timestamps = [13*60+8, 33*60+7, 134, 16, 108, 25, 111]
+    timestamps = [13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7]
     main('projects/darwin/data/experiments/all/', 100, timestamps)
     os.system("mv epochs.png time.png ../plots/")

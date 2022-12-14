@@ -72,4 +72,5 @@ def main(experiment_dir, n_augment):
 
 
 if __name__ == "__main__":
-    main('projects/darwin/data/experiments/ewg/', 200)
+    #main('projects/darwin/data/experiments/ewg/', 200)
+    main('projects/darwin/data/experiments/all/', 100)
