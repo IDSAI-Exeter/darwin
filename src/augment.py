@@ -128,7 +128,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
                 # cv2.imshow('augment', image)
                 # cv2.waitKey(0)
 
-                if alpha_ratio > 0.3 and animal_image.shape[0] * animal_image.shape[1] > 100*100:
+                if alpha_ratio > 0.3 and animal_image.shape[0] * animal_image.shape[1] > 50*50: #100*100:
 
                     species_segments[bbox['species']].append({'segment': animal_image})
 
