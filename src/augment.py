@@ -21,7 +21,7 @@ def tighten_to_visible(img):
     imageBox = pil_image.getbbox()
     pil_image = pil_image.crop(imageBox)
     nimg = np.array(pil_image)
-    ocvim = cv2.cvtColor(nimg, cv2.COLOR_RGB2BGRA)  # cv::COLOR_RGBA2BGRA
+    ocvim = cv2.cvtColor(nimg, cv2.COLOR_RGB2RGBA)  # cv::COLOR_RGBA2BGRA
     return ocvim
 
 def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
@@ -120,13 +120,15 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
                 animal_image = animal_image[y-by:y-by+h, x-bx:x-bx+w]
 
+                animal_image = tighten_to_visible(animal_image)
+
                 mask = animal_image[:, :, 3]
                 alpha_ratio = sum(flatten([[1 if p > 200 else 0 for p in l] for l in mask])) / sum(flatten([[1 for p in l] for l in mask]))
 
                 # cv2.imshow('augment', image)
                 # cv2.waitKey(0)
 
-                if alpha_ratio > 0.3:
+                if alpha_ratio > 0.3 and animal_image.shape[0] * animal_image.shape[1] > 50*50: #100*100:
 
                     species_segments[bbox['species']].append({'segment': animal_image})
 
@@ -170,9 +172,9 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
 
                 s_img = ndimage.rotate(s_img, angle)
 
-                s_img = tighten_to_visible(s_img)
+                # s_img = tighten_to_visible(s_img)
 
-                if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0 ):
+                if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0):
                     x_offset = random.randint(0, l_img.shape[1] - s_img.shape[1])
                     y_min = 0
                     if (l_img.shape[0]/2.0 - s_img.shape[0]) > 0:
@@ -195,7 +197,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
                         # l_img[y1:y2, x1:x2, c] = ( s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
 
 
-                    #cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
+                    cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
 
                     cv2.imwrite(augmented_dir + '/images/' + str(i) + '_' + str(j) + '.JPG', l_img)
 
