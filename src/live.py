@@ -14,7 +14,7 @@ def main(experiment_dir, n_augment, timings):
         l += [('a', "%sfold_%i/augment_%i/runs/augment/results.csv"%(experiment_dir, 100+i, n_augment), 100+i)]
 
     for t, f, i in l:
-        # os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
+        os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
         print("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
 
     import pandas as pd
@@ -51,8 +51,8 @@ def main(experiment_dir, n_augment, timings):
 
     dfs[6][1]['cumtime'] = cs(timings[6], dfs[6][1])  # 1000 raw
     dfs[7][1]['cumtime'] = cs(timings[7], dfs[7][1])  # 1000 aug
-     # except:
-     #     pass
+    # except:
+    #     pass
 
     fig, ax = plt.subplots()
     for t, df, i in dfs:#[:4]:
