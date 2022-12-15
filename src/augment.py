@@ -197,7 +197,7 @@ def main(experiment_dir, empty_imgs_dir, augmented_dir, n_augment):
                         # l_img[y1:y2, x1:x2, c] = ( s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
 
 
-                    cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
+                    # cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
 
                     cv2.imwrite(augmented_dir + '/images/' + str(i) + '_' + str(j) + '.JPG', l_img)
 
