@@ -1,6 +1,8 @@
 # TBC
 import os
 
+import pandas
+
 
 def main(experiment_dir, n_augment, timings):
 
@@ -71,10 +73,48 @@ def main(experiment_dir, n_augment, timings):
     plt.ylabel('metrics/mAP_0.5:0.95')
     fig.savefig('epochs.png')
 
+    kfold = {}
+    kfold['raw_'] = pandas.DataFrame()
+    kfold['aug_'] = pandas.DataFrame()
+    fig, ax = plt.subplots()
+    for t, df, i in dfs:#[:4]:
+        df[t+str(i)] = df['metrics/mAP_0.5:0.95']
+        # df[t+str(i)].plot(legend=True, title='Superbeast 101 augmented with %i images per species'%n_augment)
+        kfold[t][i] = df['metrics/mAP_0.5:0.95']
+
+    kfold['raw_']['raw'] = kfold['raw_'].mean(axis=1)
+    kfold['aug_']['raw+aug'] = kfold['aug_'].mean(axis=1)
+    kfold['raw_']['std'] = kfold['raw_'].std(axis=1)
+    kfold['aug_']['std'] = kfold['aug_'].std(axis=1)
+
+    kfold['raw_']['cumtime'] = cs(timings[0], kfold['raw_'])
+    kfold['aug_']['cumtime'] = cs(timings[1], kfold['aug_'])
+
+    # kfold['raw_'].plot(ax=ax, use_index=True, y='raw', color='black', title='K-fold cross validation')
+    # kfold['aug_'].plot(ax=ax, use_index=True, y='raw+aug', color='gray')
+    kfold['raw_'].plot(ax=ax, x='cumtime', y='raw', linestyle='solid', color='black', title='K-fold cross validation augmented with %i images per species'%n_augment)
+    kfold['aug_'].plot(ax=ax, x='cumtime', y='raw+aug', linestyle='dashdot', color='black')
+
+    import math
+
+    # plt.fill_between(x=kfold['aug_'].index, y1=kfold['aug_']['raw+aug'] - kfold['aug_']['std'], y2=kfold['aug_']['raw+aug'] + kfold['aug_']['std'])
+    # plt.fill_between(x=kfold['raw_'].index, y1=kfold['raw_']['raw'] - kfold['raw_']['std'], y2=kfold['raw_']['raw'] + kfold['raw_']['std'])
+    plt.fill_between(color='lightgray', x=kfold['aug_']['cumtime'], y1=kfold['aug_']['raw+aug'] - kfold['aug_']['std']/(2*math.sqrt(k)), y2=kfold['aug_']['raw+aug'] + kfold['aug_']['std']/(2*math.sqrt(k)))
+    plt.fill_between(color='lightgray', x=kfold['raw_']['cumtime'], y1=kfold['raw_']['raw'] - kfold['raw_']['std']/(2*math.sqrt(k)), y2=kfold['raw_']['raw'] + kfold['raw_']['std']/(2*math.sqrt(k)))
+
+    yerr = kfold['raw_']['std']
+
+    # plt.xlabel('epochs')
+    plt.xlabel('time(s)')
+    plt.ylabel('metrics/mAP_0.5:0.95')
+    fig.savefig('k-fold.png')
+
+    print(kfold)
+
 
 if __name__ == "__main__":
     #timestamps = [13, 141, 134, 16, 108, 25, 111]
     #main('projects/darwin/data/experiments/ewg/', 200, timestamps)
     timings = [13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7]
     main('projects/darwin/data/experiments/all/', 100, timings)
-    os.system("mv epochs.png time.png ../plots/")
+    os.system("mv k-fold.png epochs.png time.png ../plots/")
