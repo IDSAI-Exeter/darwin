@@ -8,16 +8,16 @@ def main(experiment_dir, n_augment, timings):
 
     k = 4
 
-    l = []
-
-    for i in range(1, k+1):
-        print(experiment_dir + "fold_%i"%(n_augment+i))
-        l += [('t', "%sfold_%i/train/runs/train/results.csv"%(experiment_dir, 100+i), 100+i)]
-        l += [('a', "%sfold_%i/augment_%i/runs/augment/results.csv"%(experiment_dir, 100+i, n_augment), 100+i)]
-
-    for t, f, i in l:
-        os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
-        print("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
+    # l = []
+    #
+    # for i in range(1, k+1):
+    #     print(experiment_dir + "fold_%i"%(n_augment+i))
+    #     l += [('t', "%sfold_%i/train/runs/train/results.csv"%(experiment_dir, 100+i), 100+i)]
+    #     l += [('a', "%sfold_%i/augment_%i/runs/augment/results.csv"%(experiment_dir, 100+i, n_augment), 100+i)]
+    #
+    # for t, f, i in l:
+    #     os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
+    #     print("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%s_%i.csv"%(f, t, i))
 
     import pandas as pd
     import matplotlib.pyplot as plt
@@ -92,7 +92,7 @@ def main(experiment_dir, n_augment, timings):
 
     # kfold['raw_'].plot(ax=ax, use_index=True, y='raw', color='black', title='K-fold cross validation')
     # kfold['aug_'].plot(ax=ax, use_index=True, y='raw+aug', color='gray')
-    kfold['raw_'].plot(ax=ax, x='cumtime', y='raw', linestyle='solid', color='black', title='K-fold cross validation augmented with %i images per species'%n_augment)
+    kfold['raw_'].plot(ax=ax, x='cumtime', y='raw', linestyle='solid', color='black') #, title='MonteCarlo Shuffle split cross validation augmented with %i images per species'%n_augment)
     kfold['aug_'].plot(ax=ax, x='cumtime', y='raw+aug', linestyle='dashdot', color='black')
 
     import math
@@ -107,7 +107,7 @@ def main(experiment_dir, n_augment, timings):
     # plt.xlabel('epochs')
     plt.xlabel('time(s)')
     plt.ylabel('metrics/mAP_0.5:0.95')
-    fig.savefig('k-fold.png')
+    fig.savefig('montecarlo-shuffle.png')
 
     print(kfold)
 
@@ -117,4 +117,4 @@ if __name__ == "__main__":
     #main('projects/darwin/data/experiments/ewg/', 200, timestamps)
     timings = [13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7]
     main('projects/darwin/data/experiments/all/', 100, timings)
-    os.system("mv k-fold.png epochs.png time.png ../plots/")
+    os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
