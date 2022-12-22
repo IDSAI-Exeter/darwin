@@ -202,6 +202,8 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             augmented_dir = experiment_dir + 'augment_' + str(r) + '_' + str(a) + '/'
             try:
                 os.mkdir(augmented_dir)
+                os.mkdir(augmented_dir + 'images')
+                os.mkdir(augmented_dir + 'labels')
             except:
                 pass
 
