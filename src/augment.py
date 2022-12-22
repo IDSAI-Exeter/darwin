@@ -11,6 +11,7 @@ import json
 from rembg import remove
 from PIL import Image
 import numpy as np
+from collections import Counter
 
 dataset_dir = "../data/serengeti_bboxes/"
 
