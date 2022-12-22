@@ -1,6 +1,7 @@
 import json
 import os
 
+n_images_per_locations = 10
 
 def main(experiment_dir):
     locations_file = experiment_dir + 'test_locations.json'
@@ -35,7 +36,7 @@ def main(experiment_dir):
                                 if annot['category_id'] == 0 and annot['location'] == location]))
         import random
         random.shuffle(empty_images_at_location)
-        empty_images += empty_images_at_location[0:100]
+        empty_images += empty_images_at_location[0:n_images_per_locations]
 
 
     batchsize = 100

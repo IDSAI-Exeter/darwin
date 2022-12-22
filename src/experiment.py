@@ -7,6 +7,8 @@ import pandas
 
 n = 1
 
+n_images_val = 10
+
 dataset_dir = "../data/serengeti_bboxes/"
 
 #experiment_dir = "../data/experiments/sample/"
@@ -136,15 +138,22 @@ def main(experiment_dir, n_images, selected_species):
             shuffled = shuffled[1:]
 
         n_test_set = i
-        #
-        # i = 0
-        #
-        # while i/n < val_ratio: #0.020:
-        #     test_set.append(shuffled[0])
-        #     i += counts[shuffled[0]]
-        #     shuffled = shuffled[1:]
-        #
-        # n_val_set = i
+
+        # Generate val set
+        individuals = [bbox for bbox in bbox_data if bbox['annotation']['location'] in test_locations
+                       and bbox['species'] == sp]
+        images = [bbox['image_id'] for bbox in individuals]
+        counts = Counter(images)
+        shuffled = list(set(images))
+        random.shuffle(shuffled)
+        i = 0
+
+        while i < n_images_val and shuffled: #0.020:
+            val_set.append(shuffled[0])
+            i += counts[shuffled[0]]
+            shuffled = shuffled[1:]
+
+        n_val_set = i
 
         #print('  # train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
         #print('  #train:', n_train_set, ' #val:', n_val_set, '#test :', n_test_set)
@@ -154,12 +163,12 @@ def main(experiment_dir, n_images, selected_species):
     species_counts = pandas.DataFrame(species_counts)
     species_counts.to_csv(experiment_dir + 'counts.csv')
 
-    for image_id in train_set:
-        filename = image_id.split('/')[-1]
-        d = 'train/'
-        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-        os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+    # for image_id in train_set:
+    #     filename = image_id.split('/')[-1]
+    #     d = 'train/'
+    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+    #     os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
     for image_id in test_set:
         filename = image_id.split('/')[-1]
@@ -168,21 +177,24 @@ def main(experiment_dir, n_images, selected_species):
         os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
         os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
-    # for image_id in val_set:
-    #     filename = image_id.split('/')[-1]
-    #     d = 'val/'
-    #     #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
-    #     os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
-    #     os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
+    for image_id in val_set:
+        filename = image_id.split('/')[-1]
+        d = 'val/'
+        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
+        os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
+        os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
     with open(experiment_dir + "test_locations.json", 'w') as json_file:
         json.dump(test_locations, json_file)
+
+    with open(experiment_dir + "train_locations.json", 'w') as json_file:
+        json.dump(train_locations, json_file)
 
     with open(experiment_dir + "train.yaml", 'w') as yaml_file:
         yaml_file.write("path: ../%s\n"%experiment_dir)
         yaml_file.write("train: train/images/\n")
         yaml_file.write("test: test/images/\n")
-        yaml_file.write("val: test/images/\n")
+        yaml_file.write("val: val/images/\n")
         yaml_file.write("\n")
         yaml_file.write("names:\n")
         for k, v in species_classes.items():
