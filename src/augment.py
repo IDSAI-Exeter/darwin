@@ -130,6 +130,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
                 #if x > 50 and y > 50 and x+w < bbox['image']['width'] - 50 and y+h < bbox['image']['height'] - 50:
                 #if bx > 50 and by > 50 and bx + bw < bbox['image']['width'] - 50 and by + bh < bbox['image']['height'] - 50:
                 if bx > 0 and by > 0 and bx + bw < bbox['image']['width'] and by + bh < bbox['image']['height'] - 200:
+                    train_file = dataset_dir+'images/'+image_id+'.JPG'
                     image = cv2.imread(train_file)
                     #cv2.rectangle(image, (int(x), int(y)), (int(x+w), int(y+h)), (255, 0, 0), 3)
 
