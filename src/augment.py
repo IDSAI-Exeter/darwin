@@ -186,7 +186,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             pass
 
         for k in species_segments.keys():
-            n_segments = len(species_segments[k])
+            # n_segments = len(species_segments[k])
             random.shuffle(species_segments[k])
             segments[k] = species_segments[k][:r]
 
@@ -209,8 +209,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             os.system("cp %s %s"%(experiment_dir + d + 'labels/*.txt', augmented_dir + 'labels/'))
 
             for k in species_segments.keys():
-                n_segments = len(segments[k])
-                max_augmented = int(r*a / n_segments)
+                max_augmented = int(r*a / len(segments[k]))
                 if not max_augmented:
                     max_augmented = 1
                 print(k, n_segments, r*a, max_augmented)
