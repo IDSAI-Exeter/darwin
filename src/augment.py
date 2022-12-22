@@ -137,7 +137,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
                     except:
                         pass
 
-                    if image:
+                    if image is not None:
                         #cv2.rectangle(image, (int(x), int(y)), (int(x+w), int(y+h)), (255, 0, 0), 3)
 
                         bx = int(bx)
