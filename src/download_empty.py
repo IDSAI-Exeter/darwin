@@ -64,7 +64,7 @@ if __name__=="__main__":
     n_images_per_locations = 10
 
     try:
-        opts, args = getopt.getopt(argv, "he:", ["experiment_dir=", "n_images_per_locations="])
+        opts, args = getopt.getopt(argv, "he:n:", ["experiment_dir=", "n_images_per_locations="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir>')
         sys.exit(2)
