@@ -31,7 +31,7 @@ def main(experiment_dir, species, n_augment):
         run("python3 download_empty.py -e %s"%fold_dir)
         run("python3 augment.py -e %s -i %i --species=%s"%(fold_dir, j, ','.join(species)))
         # run("cd %s; sbatch sbatch_train.sh; sbatch sbatch_augment_%i.sh; cd -;"%(fold_dir, j))
-        run("cd %s; sbatch sbatch_*; cd -;"%fold_dir)
+        run("cd %s; for f in sbatch_*; do sbatch \"$f\"; done; cd -;"%fold_dir)
 
 
 if __name__ == "__main__":
