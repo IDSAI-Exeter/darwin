@@ -114,7 +114,6 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             # for train_file in train_files: #[0:100]:
             #     image_id = train_file.split('/')[-1].split('.')[0]
 
-            print(image_id)
             #filename = image_id.split('/')[-1]
 
             bboxes = [annot for annot in json_data if annot['image_id'].split('/')[-1] == image_id]
@@ -169,8 +168,8 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
                     # cv2.waitKey(0)
 
                     if alpha_ratio > 0.3 and animal_image.shape[0] * animal_image.shape[1] > 50*50: #100*100:
-
-                        species_segments[bbox['species']].append({'segment': animal_image, 'image_id': image_id})
+                        print(image_id)
+                        species_segments[sp].append({'segment': animal_image, 'image_id': image_id})
                         i += 1
 
     # after browsing training files
