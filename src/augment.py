@@ -92,6 +92,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
     random.shuffle(train_files)
 
     for sp in selected_species:
+        print(sp)
         individuals = [bbox for bbox in bbox_data if bbox['annotation']['location'] in train_locations and bbox['species'] == sp]
         images = [bbox['image_id'] for bbox in individuals]
         counts = Counter(images)
@@ -113,7 +114,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             # for train_file in train_files: #[0:100]:
             #     image_id = train_file.split('/')[-1].split('.')[0]
 
-            #print(train_file, image_id)
+            print(image_id)
             #filename = image_id.split('/')[-1]
 
             bboxes = [annot for annot in json_data if annot['image_id'].split('/')[-1] == image_id]
