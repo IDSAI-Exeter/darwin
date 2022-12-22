@@ -14,7 +14,10 @@ import numpy as np
 
 dataset_dir = "../data/serengeti_bboxes/"
 
-n_segments = 500
+n_segments = 100
+
+aug_factor = [1, 2, 3, 4]
+raw_size = [1, 5, 10, 50, 100]  #, 500]
 
 
 def flatten(l):
@@ -103,7 +106,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
         n = sum(counts.values())
         i = 0
 
-        while i < n_segments:
+        while i < n_segments and shuffled:
             image_id = shuffled[0]
             shuffled = shuffled[1:]
             # for train_file in train_files: #[0:100]:
@@ -170,9 +173,6 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
 
     # after browsing training files
     # read from input now n_augment = 1000
-
-    aug_factor = [1, 2, 3, 4]
-    raw_size = [1, 5, 10, 50, 100, 500]
 
     for r in raw_size:
         raw_dir = experiment_dir + 'raw_' + str(r) + '/'
@@ -334,10 +334,11 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
                 file.write("#SBATCH --gres=gpu:1\n")
                 file.write("#SBATCH --mail-type=ALL\n")
                 file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+                file.write("#SBATCH --output=validate-%j.out\n")
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'validate(%i * %i) augmented trainset'\n"%(r, a))
-                file.write("python3 ../../../../lib/yolov5/val.py --data augment_%i_%i.yaml --weights augment_%i_%i/runs/augment/weights/best.pt --project ../val/ --save-txt --verbose\n"%(r, a, r, a))
+                file.write("python3 ../../../../lib/yolov5/val.py --data augment_%i_%i.yaml --weights augment_%i_%i/runs/augment/weights/best.pt --project validate/ --save-txt --verbose\n"%(r, a, r, a))
                 file.write("\n")
                 file.close()
 
@@ -389,12 +390,14 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             file.write("#SBATCH --gres=gpu:1\n")
             file.write("#SBATCH --mail-type=ALL\n")
             file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+            file.write("#SBATCH --output=validate-%j.out\n")
             file.write("source ../../../../../../.profile\n")
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'validate(%i) raw trainset'\n"%r)
-            file.write("python3 ../../../../lib/yolov5/val.py --data raw_%i.yaml --weights raw_%i/runs/raw/weights/best.pt --project ../val/ --save-txt --verbose\n"%(r, r))
+            file.write("python3 ../../../../lib/yolov5/val.py --data raw_%i.yaml --weights raw_%i/runs/raw/weights/best.pt --project validate/ --save-txt --verbose\n"%(r, r))
             file.write("\n")
             file.close()
+
 
 if __name__ == '__main__':
     import sys, getopt
