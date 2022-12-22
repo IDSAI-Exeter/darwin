@@ -14,10 +14,10 @@ import numpy as np
 
 dataset_dir = "../data/serengeti_bboxes/"
 
-n_segments = 100
+n_segments = 50
 
 aug_factor = [1, 2, 3, 4]
-raw_size = [1, 5, 10, 50, 100]  #, 500]
+raw_size = [1, 5, 10, 50]  #, 500]
 
 
 def flatten(l):
@@ -407,13 +407,13 @@ if __name__ == '__main__':
     n_augment = 0
     species = []
     try:
-        opts, args = getopt.getopt(argv, "he:i:", ["experiment_dir=", "n_images="])
+        opts, args = getopt.getopt(argv, "he:i:s:", ["experiment_dir=", "n_images=", "species="])
     except getopt.GetoptError:
-        print('script.py -e <experiment_dir> -i <n_images>')
+        print('script.py -e <experiment_dir> -i <n_images> -s <species>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('script.py -e <experiment_dir> -i <n_images>')
+            print('script.py -e <experiment_dir> -i <n_images> -s <species>')
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
