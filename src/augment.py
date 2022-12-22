@@ -112,7 +112,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             image_id = shuffled[0]
             shuffled = shuffled[1:]
             # for train_file in train_files: #[0:100]:
-            #     image_id = train_file.split('/')[-1].split('.')[0]
+            image_id = image_id.split('/')[-1]
 
             #filename = image_id.split('/')[-1]
 
