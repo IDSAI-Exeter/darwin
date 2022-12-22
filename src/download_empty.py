@@ -1,9 +1,8 @@
 import json
 import os
 
-n_images_per_locations = 10
 
-def main(experiment_dir):
+def main(experiment_dir, n_images_per_locations):
     locations_file = experiment_dir + 'test_locations.json'
     empty_directory = experiment_dir + '/empty/'
 
@@ -62,9 +61,10 @@ if __name__=="__main__":
 
     experiment_dir = ''
     argv = sys.argv[1:]
+    n_images_per_locations = 10
 
     try:
-        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+        opts, args = getopt.getopt(argv, "he:", ["experiment_dir=", "n_images_per_locations="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir>')
         sys.exit(2)
@@ -74,7 +74,9 @@ if __name__=="__main__":
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
+        elif opt in ("-n", "--n_images_per_locations"):
+            n_images_per_locations = arg
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
-    main(experiment_dir)
+    main(experiment_dir, n_images_per_locations)

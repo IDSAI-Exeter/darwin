@@ -117,7 +117,8 @@ def main(experiment_dir, n_images, selected_species):
         #while i/n < train_ratio: #0.01:
         while i < n_images and shuffled:
             train_set.append(shuffled[0])
-            i += counts[shuffled[0]]
+            # i += counts[shuffled[0]]
+            i += 1
             shuffled = shuffled[1:]
 
         n_train_set = i
@@ -134,7 +135,8 @@ def main(experiment_dir, n_images, selected_species):
         i = 0
         while shuffled:
             test_set.append(shuffled[0])
-            i += counts[shuffled[0]]
+            # i += counts[shuffled[0]]
+            i += 1
             shuffled = shuffled[1:]
 
         n_test_set = i
@@ -150,16 +152,17 @@ def main(experiment_dir, n_images, selected_species):
 
         while i < n_images_val and shuffled: #0.020:
             val_set.append(shuffled[0])
-            i += counts[shuffled[0]]
+            # i += counts[shuffled[0]]
+            i += 1
             shuffled = shuffled[1:]
 
         n_val_set = i
 
         #print('  # train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
         #print('  #train:', n_train_set, ' #val:', n_val_set, '#test :', n_test_set)
-        species_counts.append({'species': sp, 'total': n_total, 'train': n_train_set, 'test': n_test_set})#, 'val' : n_val_set})
+        species_counts.append({'species': sp, 'total': n_total, 'train': n_train_set, 'test': n_test_set, 'val' : n_val_set})
 
-    print('# train:', len(train_set), ' # val:', '# test :', len(test_set))
+    print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
     species_counts = pandas.DataFrame(species_counts)
     species_counts.to_csv(experiment_dir + 'counts.csv')
 

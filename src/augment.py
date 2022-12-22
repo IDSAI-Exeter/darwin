@@ -15,10 +15,7 @@ from collections import Counter
 
 dataset_dir = "../data/serengeti_bboxes/"
 
-n_segments = 10
 
-aug_factor = [1, 2, 4]
-raw_size = [1, 5, 10]  #, 500]
 
 
 def flatten(l):
@@ -34,7 +31,9 @@ def tighten_to_visible(img):
     return ocvim
 
 
-def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
+def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_species):
+
+    n_segments = max(raw_sizes)
 
     print(experiment_dir, empty_imgs_dir)
 
@@ -182,7 +181,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
     # after browsing training files
     # read from input now n_augment = 1000
 
-    for r in raw_size:
+    for r in raw_sizes:
         raw_dir = experiment_dir + 'raw_' + str(r) + '/'
         segments = {}
         d = 'raw_%i/' % r
@@ -206,7 +205,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
                 os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
                 os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
-        for a in aug_factor:
+        for a in aug_factors:
             print("raw %i, aug %i"%(r, a))
 
             augmented_dir = experiment_dir + 'augment_' + str(r) + '_' + str(a) + '/'
@@ -416,10 +415,11 @@ if __name__ == '__main__':
 
     experiment_dir = ''
     argv = sys.argv[1:]
-    n_augment = 0
+    aug_factors = [1, 2, 4]
+    raw_sizes = [1, 5, 10]  # , 500]
     species = []
     try:
-        opts, args = getopt.getopt(argv, "he:i:s:", ["experiment_dir=", "n_images=", "species="])
+        opts, args = getopt.getopt(argv, "he:r:a:s:", ["experiment_dir=", "raw_sizes=", "aug_factors=", "species="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir> -i <n_images> -s <species>')
         sys.exit(2)
@@ -429,8 +429,10 @@ if __name__ == '__main__':
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
-        elif opt in ("-i", "--n_images"):
-            n_augment = int(arg)
+        elif opt in ("-r", "--raw_sizes"):
+            raw_sizes = [int(s.strip().lower()) for s in arg.split(',')]
+        elif opt in ("-a", "--aug_factors"):
+            aug_factors = [int(s.strip().lower()) for s in arg.split(',')]
         elif opt in ("-s", "--species"):
             species = [s.strip().lower() for s in arg.split(',')]
 
@@ -438,4 +440,4 @@ if __name__ == '__main__':
         experiment_dir += '/'
 
     empty_imgs_dir = experiment_dir + 'empty/'
-    main(experiment_dir, empty_imgs_dir, n_augment, species)
+    main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, species)
