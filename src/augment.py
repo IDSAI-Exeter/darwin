@@ -191,9 +191,10 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
             # n_segments = len(species_segments[k])
             random.shuffle(species_segments[k])
             segments[k] = species_segments[k][:r]
-
+            print(k, len(segments[k]))
             for segment in segments[k]:
                 filename = segment['image_id']
+                print(filename)
                 #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
                 os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
                 os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
