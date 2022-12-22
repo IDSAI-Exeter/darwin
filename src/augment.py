@@ -39,7 +39,7 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
 
     train_locations_file = experiment_dir + 'train_locations.json'
     train_locations = None
-    with open(locations_file) as json_file:
+    with open(train_locations_file) as json_file:
         train_locations = json.load(json_file)
         json_file.close()
 
