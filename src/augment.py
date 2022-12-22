@@ -15,10 +15,10 @@ from collections import Counter
 
 dataset_dir = "../data/serengeti_bboxes/"
 
-n_segments = 50
+n_segments = 10
 
-aug_factor = [1, 2, 3, 4]
-raw_size = [1, 5, 10, 50]  #, 500]
+aug_factor = [1, 2, 4]
+raw_size = [1, 5, 10]  #, 500]
 
 
 def flatten(l):
@@ -131,47 +131,53 @@ def main(experiment_dir, empty_imgs_dir, n_augment, selected_species):
                 #if bx > 50 and by > 50 and bx + bw < bbox['image']['width'] - 50 and by + bh < bbox['image']['height'] - 50:
                 if bx > 0 and by > 0 and bx + bw < bbox['image']['width'] and by + bh < bbox['image']['height'] - 200:
                     train_file = dataset_dir+'images/'+image_id+'.JPG'
-                    image = cv2.imread(train_file)
-                    #cv2.rectangle(image, (int(x), int(y)), (int(x+w), int(y+h)), (255, 0, 0), 3)
+                    image = None
+                    try:
+                        image = cv2.imread(train_file)
+                    except:
+                        pass
 
-                    bx = int(bx)
-                    by = int(by)
-                    bw = int(bw)
-                    bh = int(bh)
+                    if image:
+                        #cv2.rectangle(image, (int(x), int(y)), (int(x+w), int(y+h)), (255, 0, 0), 3)
 
-                    x = int(x)
-                    y = int(y)
-                    w = int(w)
-                    h = int(h)
+                        bx = int(bx)
+                        by = int(by)
+                        bw = int(bw)
+                        bh = int(bh)
 
-                    # x = int(x) - 10
-                    # y = int(y) - 10
-                    # w = int(w) + 20
-                    # h = int(h) + 20
+                        x = int(x)
+                        y = int(y)
+                        w = int(w)
+                        h = int(h)
 
-                    # cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 3)
+                        # x = int(x) - 10
+                        # y = int(y) - 10
+                        # w = int(w) + 20
+                        # h = int(h) + 20
 
-                    # cv2.imshow('augment', image)
-                    # cv2.waitKey(0)
+                        # cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 3)
 
-                    crop_img = image[y:y + h, x:x + w]
-                    crop_img = image[by:by + bh, bx:bx + bw]
-                    animal_image = remove(crop_img) #, alpha_matting=True)
+                        # cv2.imshow('augment', image)
+                        # cv2.waitKey(0)
 
-                    animal_image = animal_image[y-by:y-by+h, x-bx:x-bx+w]
+                        crop_img = image[y:y + h, x:x + w]
+                        crop_img = image[by:by + bh, bx:bx + bw]
+                        animal_image = remove(crop_img) #, alpha_matting=True)
 
-                    animal_image = tighten_to_visible(animal_image)
+                        animal_image = animal_image[y-by:y-by+h, x-bx:x-bx+w]
 
-                    mask = animal_image[:, :, 3]
-                    alpha_ratio = sum(flatten([[1 if p > 200 else 0 for p in l] for l in mask])) / sum(flatten([[1 for p in l] for l in mask]))
+                        animal_image = tighten_to_visible(animal_image)
 
-                    # cv2.imshow('augment', image)
-                    # cv2.waitKey(0)
+                        mask = animal_image[:, :, 3]
+                        alpha_ratio = sum(flatten([[1 if p > 200 else 0 for p in l] for l in mask])) / sum(flatten([[1 for p in l] for l in mask]))
 
-                    if alpha_ratio > 0.3 and animal_image.shape[0] * animal_image.shape[1] > 50*50: #100*100:
-                        print(image_id)
-                        species_segments[sp].append({'segment': animal_image, 'image_id': image_id})
-                        i += 1
+                        # cv2.imshow('augment', image)
+                        # cv2.waitKey(0)
+
+                        if alpha_ratio > 0.3 and animal_image.shape[0] * animal_image.shape[1] > 50*50: #100*100:
+                            print(image_id)
+                            species_segments[sp].append({'segment': animal_image, 'image_id': image_id})
+                            i += 1
 
     # after browsing training files
     # read from input now n_augment = 1000
