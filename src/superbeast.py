@@ -11,14 +11,12 @@ def main(experiment_dir, species, raw_sizes, aug_factors, n_empty):
 
     print("\nGenerating %i FOLD experiment in %s for the following species :\n\t%s\n"%(k, experiment_dir, ', '.join(species)))
 
-    j = n_augment
-
     try:
         os.mkdir(experiment_dir)
     except:
         pass
 
-    for i, f in [(100, f) for f in range(1, k+1)]:
+    for i, f in [(10, f) for f in range(1, k+1)]:
 
         fold_dir = experiment_dir + "fold_%i"%(i+f)
 
@@ -27,7 +25,7 @@ def main(experiment_dir, species, raw_sizes, aug_factors, n_empty):
         except:
             pass
 
-        run("python3 experiment.py -e %s --n_images=%i --species=%s"%(fold_dir, i, ','.join(species)))
+        run("python3 experiment.py -e %s --n_images=%i --species=%s"%(fold_dir, i, ','.join(species))) # i is the number of images per species for the validation set.
         run("python3 download_empty.py -e %s -n %i"%(fold_dir, n_empty))
         run("python3 augment.py -e %s -r %s -a %s --species=%s"%(fold_dir, ','.join([str(x) for x in raw_sizes]), ','.join([str(x) for x in aug_factors]), ','.join(species)))
         run("cd %s; for f in sbatch_*; do sbatch \"$f\"; done; cd -;"%fold_dir)

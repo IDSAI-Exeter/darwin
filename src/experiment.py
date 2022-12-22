@@ -7,8 +7,6 @@ import pandas
 
 n = 1
 
-n_images_val = 10
-
 dataset_dir = "../data/serengeti_bboxes/"
 
 #experiment_dir = "../data/experiments/sample/"
@@ -21,6 +19,9 @@ species_bbox_file = '../data/bbox_species.json'
 
 
 def main(experiment_dir, n_images, selected_species):
+
+    n_images_val = n_images
+
     try:
         os.mkdir("../data/experiments")
     except:
