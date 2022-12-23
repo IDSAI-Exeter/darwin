@@ -75,7 +75,7 @@ if __name__=="__main__":
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
         elif opt in ("-n", "--n_images_per_locations"):
-            n_images_per_locations = arg
+            n_images_per_locations = int(arg)
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
