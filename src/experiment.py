@@ -233,15 +233,15 @@ if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(argv, "he:i:s:", ["experiment_dir=", "n_images=", "species="])
     except getopt.GetoptError:
-        print('script.py -e <experiment_dir> -i <n_images> -s <species>')
+        print('script.py -e <experiment_dir> -n <n_images> -s <species>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('script.py -e <experiment_dir> -i <n_images> -s <species>')
+            print('script.py -e <experiment_dir> -n <n_images> -s <species>')
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
-        elif opt in ("-i", "--n_images"):
+        elif opt in ("-n", "--n_images"):
             n_images = int(arg)
         elif opt in ("-s", "--species"):
             species = [s.strip().lower() for s in arg.split(',')]

@@ -9,3 +9,5 @@ unzip SnapshotSerengetiBboxes_20190903.json.zip
 mkdir data/serengeti_bboxes
 mkdir data/serengeti_bboxes/images
 find data/images/ -type f -exec cp {} data/serengeti_bboxes/images/ \;
+cd src;python3 download_bbox.py
+cd ../
