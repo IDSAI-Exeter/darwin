@@ -4,7 +4,7 @@ import os
 
 def main(experiment_dir, n_images_per_locations):
     locations_file = experiment_dir + 'test_locations.json'
-    empty_directory = experiment_dir + '/empty/'
+    empty_directory = experiment_dir + 'empty/'
 
     try:
         os.mkdir(empty_directory)
