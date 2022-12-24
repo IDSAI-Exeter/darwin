@@ -12,6 +12,11 @@ def main(experiment_dir, species, raw_sizes, aug_factors, n_empty):
     print("\nGenerating %i FOLD experiment in %s for the following species :\n\t%s\n"%(k, experiment_dir, ', '.join(species)))
 
     try:
+        os.mkdir("../data/experiments/")
+    except:
+        pass
+
+    try:
         os.mkdir(experiment_dir)
     except:
         pass
