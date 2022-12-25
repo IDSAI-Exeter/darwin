@@ -30,10 +30,10 @@ def main(dir):
         for test in ["raw_" + str(i) for i in [1]]:
             raw = parse(dir + "%s_%s.out"%(fold, test))
             if raw:
-            for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
-                augment = parse(dir + "%s_%s.out"%(fold, test))
-                delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
-            deltas.append(delta)
+                for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
+                    augment = parse(dir + "%s_%s.out"%(fold, test))
+                    delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
+                deltas.append(delta)
 
     df = pd.DataFrame(delta)
     print(df)
