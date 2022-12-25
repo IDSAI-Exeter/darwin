@@ -16,8 +16,6 @@ from collections import Counter
 dataset_dir = "../data/serengeti_bboxes/"
 
 
-
-
 def flatten(l):
     return [item for sublist in l for item in sublist]
 
@@ -281,7 +279,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
                             # cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
 
-                            cv2.imwrite(augmented_dir + '/images/' + str(i) + '_' + str(j) + '.JPG', l_img)
+                            cv2.imwrite(augmented_dir + '/images/' + str(classes[k]) + '_' + str(j) + '.JPG', l_img)
 
                             # convert to center x, center y, w, h
                             cx = x1 + s_img.shape[1] / 2.0
