@@ -29,7 +29,7 @@ def main(dir):
         delta = []
         for test in ["raw_" + str(i) for i in [1]]:
             raw = parse(dir + "%s_%s.out"%(fold, test))
-            if not raw.empty:
+            if raw is not None:
                 for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
