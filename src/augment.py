@@ -166,7 +166,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                         animal_image = tighten_to_visible(animal_image)
 
                         mask = animal_image[:, :, 3]
-                        alpha_ratio = sum(flatten([[1 if p > 200 else 0 for p in l] for l in mask])) / sum(flatten([[1 for p in l] for l in mask]))
+                        alpha_ratio = sum(flatten([[1 if p > 250 else 0 for p in l] for l in mask])) / sum(flatten([[1 for p in l] for l in mask]))
 
                         # cv2.imshow('augment', image)
                         # cv2.waitKey(0)
