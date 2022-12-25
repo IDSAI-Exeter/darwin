@@ -35,7 +35,7 @@ def main(dir):
                     delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
                 deltas.append(delta)
 
-    df = pd.DataFrame(delta)
+    df = pd.DataFrame(deltas)
     print(df)
 
 if __name__ == "__main__":
