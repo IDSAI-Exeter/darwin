@@ -28,6 +28,7 @@ def main(dir):
     for fold in ["fold_" + str(i) for i in range(11, 18)]:
         delta = []
         for test in ["raw_" + str(i) for i in [1]]:
+            print(test)
             raw = parse(dir + "%s_%s.out"%(fold, test))
             if raw is not None:
                 for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
@@ -36,6 +37,7 @@ def main(dir):
                 deltas.append(delta)
 
     df = pd.DataFrame(deltas)
+    df.columns = [str(i) for i in [1, 2, 4, 8]]
     print(df)
 
 if __name__ == "__main__":
