@@ -15,10 +15,12 @@ def parse(f):
             intable = False
         if intable:
             rows.append(row)
-
-    df = pd.DataFrame(rows)
-    df.columns = ['Class', 'Images', 'Instances', 'P', 'R', 'mAP50', 'mAP50-95']
-    return df
+    if rows:
+        df = pd.DataFrame(rows)
+        df.columns = ['Class', 'Images', 'Instances', 'P', 'R', 'mAP50', 'mAP50-95']
+        return df
+    else:
+        return None
 
 def main(dir):
     raw = None
@@ -27,10 +29,11 @@ def main(dir):
         delta = []
         for test in ["raw_" + str(i) for i in [1]]:
             raw = parse(dir + "%s_%s.out"%(fold, test))
-        for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
-            augment = parse(dir + "%s_%s.out"%(fold, test))
-            delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
-        deltas.append(delta)
+            if raw:
+            for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
+                augment = parse(dir + "%s_%s.out"%(fold, test))
+                delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
+            deltas.append(delta)
 
     df = pd.DataFrame(delta)
     print(df)
