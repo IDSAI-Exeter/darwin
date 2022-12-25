@@ -1,5 +1,6 @@
 import glob
 import pandas as pd
+import math
 
 def parse(f):
     intable = False
@@ -39,7 +40,7 @@ def main(dir):
     df = pd.DataFrame(deltas)
     df.columns = [str(i) for i in [1, 2, 4, 8]]
     print(df.mean())
-    print(df.std())
+    print(df.std()/math.sqrt(len(df)))
 
 
 if __name__ == "__main__":
