@@ -38,7 +38,9 @@ def main(dir):
 
     df = pd.DataFrame(deltas)
     df.columns = [str(i) for i in [1, 2, 4, 8]]
-    print(df)
+    print(df.mean())
+    print(df.std())
+
 
 if __name__ == "__main__":
     main("../data/experiments/montecarlo/results/")
