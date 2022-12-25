@@ -29,7 +29,7 @@ def main(dir):
             raw = parse(dir + "%s_%s.out"%(fold, test))
         for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
             augment = parse(dir + "%s_%s.out"%(fold, test))
-            delta.append(augment[0]['mAP50-95'] - raw[0]['mAP50-95'])
+            delta.append(augment.loc[0]['mAP50-95'] - raw.loc[0]['mAP50-95'])
         deltas.append(delta)
 
     df = pd.DataFrame(delta)
