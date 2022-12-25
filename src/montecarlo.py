@@ -5,11 +5,9 @@ def run(command):
     os.system(command)
 
 
-def main(experiment_dir, species, raw_sizes, aug_factors, n_empty):
+def main(experiment_dir, species, raw_sizes, aug_factors, n_empty, k):
 
-    k = 1
-
-    print("\nGenerating %i FOLD experiment in %s for the following species :\n\t%s\n"%(k, experiment_dir, ', '.join(species)))
+    print("\nGenerating %i montecarlo experiments in %s for the following species :\n\t%s\n"%(k, experiment_dir, ', '.join(species)))
 
     try:
         os.mkdir("../data/experiments/")
@@ -45,15 +43,15 @@ if __name__ == "__main__":
     aug_factors = [1, 2, 4]
     raw_sizes = [1, 5, 10]
     n_empty = 0
-
+    k = 1
     try:
-        opts, args = getopt.getopt(argv, "he:s:r:a:n:", ["experiment_dir=", "species=", "raw_sizes=", "aug_factors=", "n_empty="])
+        opts, args = getopt.getopt(argv, "he:s:r:a:n:k:", ["experiment_dir=", "species=", "raw_sizes=", "aug_factors=", "n_empty=", "k-groups="])
     except getopt.GetoptError:
-        print('script.py -e <experiment_dir> -s <species> -n <n_augment>')
+        print('script.py -e <experiment_dir> -s <species> -r <raw_sizes> -a <aug_factors> -n <n_empty> -k <k-groups>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('script.py -e <experiment_dir> -s <species> -n <n_augment>')
+            print('script.py -e <experiment_dir> -s <species> -r <raw_sizes> -a <aug_factors> -n <n_empty> -k <k-groups>')
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
@@ -65,9 +63,11 @@ if __name__ == "__main__":
             aug_factors = [int(s.strip().lower()) for s in arg.split(',')]
         elif opt in ("-n", "--n_empty"):
             n_empty = int(arg)
+        elif opt in ("-k", "--k-groups"):
+            k = int(arg)
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
 
-    main(experiment_dir, species, raw_sizes, aug_factors, n_empty)
+    main(experiment_dir, species, raw_sizes, aug_factors, n_empty, k)
 
