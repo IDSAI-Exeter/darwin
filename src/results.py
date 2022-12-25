@@ -25,7 +25,7 @@ def parse(f):
 def main(dir):
     raw = None
     deltas = []
-    for fold in ["fold_" + str(i) for i in range(11, 21)]:
+    for fold in ["fold_" + str(i) for i in range(11, 18)]:
         delta = []
         for test in ["raw_" + str(i) for i in [1]]:
             raw = parse(dir + "%s_%s.out"%(fold, test))
