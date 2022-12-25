@@ -36,4 +36,4 @@ def main(dir):
     print(df)
 
 if __name__ == "__main__":
-    main("../data/experiments/monetcarlo")
+    main("../data/experiments/monetcarlo/")
