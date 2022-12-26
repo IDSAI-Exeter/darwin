@@ -23,16 +23,15 @@ def parse(f):
     else:
         return None
 
-def main(dir):
+def main(dir, raw_sizes, aug_factors):
     raw = None
     deltas = []
-    for fold in ["fold_" + str(i) for i in range(11, 18)]:
+    for fold in ["fold_" + str(i) for i in range(11, 21)]:
         delta = []
-        for r in ["raw_" + str(i) for i in [1]]:
+        for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
             if raw is not None:
-                print(r)
-                for test in ["augment_1_" + str(i) for i in [1, 2, 4, 8]]:
+                for test in ["augment_1_" + str(i) for i in aug_factors]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
                 deltas.append(delta)
@@ -44,4 +43,4 @@ def main(dir):
 
 
 if __name__ == "__main__":
-    main("../data/experiments/montecarlo/results/")
+    main("../data/experiments/montecarlo/results/", [1], [1, 2, 4, 8, 16, 32])
