@@ -44,4 +44,4 @@ def main(dir, raw_sizes, aug_factors):
 
 
 if __name__ == "__main__":
-    main("../data/experiments/montecarlo/results/", [1], [1, 2, 4, 8, 16, 32])
+    main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
