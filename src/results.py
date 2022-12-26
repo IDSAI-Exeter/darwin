@@ -41,7 +41,7 @@ def main(dir, raw_sizes, aug_factors):
                 deltas.append(delta)
 
     df = pd.DataFrame(deltas)
-    df.columns = [str(i) for i in [1, 2, 4, 8]]
+    df.columns = [str(i) for i in aug_factors]
     print(df.mean())
     print(df.std()/math.sqrt(len(df)))
 
