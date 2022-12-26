@@ -33,7 +33,8 @@ def main(dir, raw_sizes, aug_factors):
             if raw is not None:
                 for test in ["augment_1_" + str(i) for i in aug_factors]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
-                    delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
+                    if augment is not None:
+                        delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
                 deltas.append(delta)
 
     df = pd.DataFrame(deltas)
