@@ -5,7 +5,10 @@ import math
 def parse(f):
     intable = False
     rows = []
-    txt = open(f).readlines()
+    try:
+        txt = open(f).readlines()
+    except:
+        return None
     for line in txt:
         for space in reversed(range(1,20)):
             line = line.strip().replace(" "*space, "\t")
