@@ -60,7 +60,7 @@ def main(dir, raw_sizes, aug_factors):
     print(df_species)
     print(species_list)
     df_species = df_species.T
-    df_species['species'] = species_list
+    # df_species['species'] = species_list
     print(df_species)
 
 
