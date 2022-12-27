@@ -42,10 +42,10 @@ def main(dir, raw_sizes, aug_factors):
                 for test in ["augment_1_" + str(i) for i in aug_factors]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     if augment is not None:
-                        delta.append(float(augment.loc[0]['mAP50-95']) - float(raw.loc[0]['mAP50-95']))
+                        delta.append(float(augment.iloc[0]['mAP50-95']) - float(raw.iloc[0]['mAP50-95']))
                         if test == "augment_1_1":
                             for i in range(1, len(augment)):
-                                species.append(float(augment.loc[i]['mAP50-95']) - float(raw.loc[i]['mAP50-95']))
+                                species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
                 deltas_species.append(species)
                 deltas.append(delta)
 
