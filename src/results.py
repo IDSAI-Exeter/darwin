@@ -31,26 +31,23 @@ def main(dir, raw_sizes, aug_factors):
     deltas = []
     deltas_species = []
     species_list = None
-
+    dfs = []
     for fold in ["fold_" + str(i) for i in range(11, 21)]:
         delta = []
         for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
             if raw is not None:
-                print('raw', raw)
+                dfs.append(raw)
                 for test in ["augment_1_" + str(i) for i in aug_factors]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     if augment is not None:
                         delta.append(float(augment.iloc[0]['mAP50-95']) - float(raw.iloc[0]['mAP50-95']))
-                        if test == "augment_1_1":
-                            print('augment', augment)
-                            species_list = [] #list(augment['Class'])[1:]
+                        if test == "augment_1_1" and len(augment) == 47:
                             species = []
                             for i in range(1, len(augment)):
-                                species_list.append(augment.iloc[i]['Class'])
+                                # species_list.append(augment.iloc[i]['Class'])
                                 species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
                             deltas_species.append(species)
-                            deltas_species.append(species_list)
                 deltas.append(delta)
 
     df = pd.DataFrame(deltas)
@@ -58,11 +55,12 @@ def main(dir, raw_sizes, aug_factors):
     print(df.mean())
     print(df.std()/math.sqrt(len(df)))
 
+    species_list = list(dfs[0]['Class'])[1:]
     df_species = pd.DataFrame(deltas_species)
     print(df_species)
     print(species_list)
     df_species = df_species.T
-    # df_species['species'] = species_list
+    df_species['species'] = species_list
     print(df_species)
 
 
