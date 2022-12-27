@@ -37,7 +37,7 @@ def main(dir, raw_sizes, aug_factors):
         for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
             if raw is not None:
-                species_list = list(raw['Class'])[1:]
+                species_list = list(raw['Class'])[0:]
                 for test in ["augment_1_" + str(i) for i in aug_factors]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     if augment is not None:
