@@ -30,12 +30,14 @@ def main(dir, raw_sizes, aug_factors):
     raw = None
     deltas = []
     deltas_species = []
+    species_list = None
 
     for fold in ["fold_" + str(i) for i in range(11, 21)]:
         delta = []
         species = []
         for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
+            species_list = list(raw['Class'])[1:]
             if raw is not None:
                 for test in ["augment_1_" + str(i) for i in aug_factors]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
@@ -53,7 +55,7 @@ def main(dir, raw_sizes, aug_factors):
     print(df.std()/math.sqrt(len(df)))
 
     df_species = pd.DataFrame(deltas_species)
-    df_species.columns = list(raw['Class'])[1:]
+    df_species.columns = species_list
     print(df_species)
 
 if __name__ == "__main__":
