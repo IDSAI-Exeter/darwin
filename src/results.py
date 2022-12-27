@@ -44,8 +44,9 @@ def main(dir, raw_sizes, aug_factors):
                         delta.append(float(augment.iloc[0]['mAP50-95']) - float(raw.iloc[0]['mAP50-95']))
                         if test == "augment_1_1":
                             species = []
+                            print(augment)
                             for i in range(1, len(augment)):
-                                print(augment.iloc[i]['Class'])
+                                # print(augment.iloc[i]['Class'])
                                 species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
                             deltas_species.append(species)
                 deltas.append(delta)
