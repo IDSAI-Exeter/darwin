@@ -42,7 +42,7 @@ def main(dir, raw_sizes, aug_factors):
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     if augment is not None:
                         delta.append(float(augment.iloc[0]['mAP50-95']) - float(raw.iloc[0]['mAP50-95']))
-                        if test == "augment_1_1" and len(augment) == 32:
+                        if test == "augment_1_1":# and len(augment) == 32:
                             species = []
                             for i in range(1, len(augment)):
                                 # species_list.append(augment.iloc[i]['Class'])
