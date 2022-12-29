@@ -8,17 +8,12 @@ def main():
         json_data = json.load(json_file)
         json_file.close()
 
-    season = 'S5' #S06
-    location = 'C11' #'G07'
-
     seasons = sorted(list(set([annot['annotation']['season'] for annot in json_data])))
 
     discard = []
     keep = []
 
     cnt = 0
-
-    # undo 'z'
 
     bins = []
 
@@ -39,11 +34,9 @@ def main():
         location = bin['location']
         seen.append({'season': season, 'location': location})
 
-
         print(len(seen), '/', len(bins), season, location)
 
         location_bboxes = [annot for annot in json_data if annot['annotation']['location'] == location and annot['annotation']['season'] == season]
-        #image = cv2.imread('../data/serengeti_bboxes/images/'+image_id + '.JPG')
         images = list(set([bbox['image_id'] for bbox in location_bboxes]))
 
         validated = False
@@ -93,9 +86,6 @@ def main():
                     bins = [last] + bins
                     validated = True
                     break
-
-        #print('keep', keep)
-        #print('discard', discard)
 
         json.dump(discard, open('discard.json', 'w'))
         json.dump(keep, open('keep.json', 'w'))

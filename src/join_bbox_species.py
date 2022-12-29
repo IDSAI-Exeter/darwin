@@ -1,4 +1,4 @@
-# Purpose : generate a file with bboxes and species for futher use and not have to load the whole dataset
+# Purpose : generate a file with bboxes and species for further use and not have to load the whole dataset
 
 import json
 from pprint import pprint
@@ -6,9 +6,9 @@ from pprint import pprint
 import pandas
 import json
 
+
 def main():
     json_data = None
-    #with open('../data/SnapshotSerengetiS01.json') as json_file:
     with open('../data/SnapshotSerengeti_S1-11_v2.1.json') as json_file:
         json_data = json.load(json_file)
         json_file.close()

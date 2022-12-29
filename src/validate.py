@@ -23,5 +23,5 @@ def main(dir):
     #     os.system("cd %s; python3 ../../../../lib/yolov5/val.py --data %s.yaml --weights %s/runs/raw/weights/best.pt --project validate/ --verbose --task test 2> ../results/%s_%s.out;cd -"%(dir+fold, test, test, fold, test))
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main("../data/experiments/montecarlo/")

@@ -30,20 +30,13 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
     n_segments = max(raw_sizes)
 
-    print(experiment_dir, empty_imgs_dir)
-
     train_locations_file = experiment_dir + 'train_locations.json'
     train_locations = None
     with open(train_locations_file) as json_file:
         train_locations = json.load(json_file)
         json_file.close()
 
-
     i = 0
-    #training_set = os.listdir(train_dir)
-
-    train_files = glob.glob(experiment_dir + 'train' + '/images/*.JPG')
-    train_labels = glob.glob(experiment_dir + 'train' + '/labels/*.txt')
     empty_images = glob.glob(empty_imgs_dir + '*.JPG')
 
     try:
@@ -52,14 +45,6 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
         os.mkdir(augmented_dir + 'labels')
     except:
         pass
-
-    # # cp -r train augmented
-    # os.system("cp %s %s"%(experiment_dir + '/train' + '/images/*.JPG', augmented_dir + '/images/'))
-    # os.system("cp %s %s"%(experiment_dir + '/train' + '/labels/*.txt', augmented_dir + '/labels/'))
-
-    # animal_dir = '../data/animals/'
-    # animal_image = cv2.imread(animals[15])
-    # animals = glob.glob(animal_dir + '*.jpg')
 
     import yaml
     classes = {}
@@ -77,7 +62,6 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
     species_file = '../data/serengeti_bboxes/species_classes.json'
     species_classes = json.load(open(species_file))
-    #species_classes = classes
 
     segments_data = None
     with open('../segments.json') as json_file:
@@ -89,17 +73,11 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
     from collections import defaultdict
     species_segments = defaultdict(list)
 
-    random.shuffle(train_files)
-
     for sp in selected_species:
-        print(sp)
         individuals = [bbox for bbox in bbox_data if bbox['annotation']['location'] in train_locations and bbox['species'] == sp]
         images = [bbox['image_id'] for bbox in individuals]
         images = [image_id for image_id in images if image_id.split('/')[-1] in high_quality]
         counts = Counter(images)
-
-        #print('species :', sp, '# :', len(individuals))
-        #print('        # images :', len(counts.keys()))
 
         n_total = len(individuals)
 
@@ -116,7 +94,6 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
             bboxes = [annot for annot in json_data if annot['image_id'].split('/')[-1] == image_id]
 
-            #for bbox in bboxes:
             # restrict to images with only one bbox
             if len(bboxes) == 1:
                 bbox = bboxes[0]
@@ -146,16 +123,6 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                         w = int(w)
                         h = int(h)
 
-                        # x = int(x) - 10
-                        # y = int(y) - 10
-                        # w = int(w) + 20
-                        # h = int(h) + 20
-
-                        # cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 3)
-
-                        # cv2.imshow('augment', image)
-                        # cv2.waitKey(0)
-
                         crop_img = image[y:y + h, x:x + w]
                         crop_img = image[by:by + bh, bx:bx + bw]
                         animal_image = remove(crop_img) #, alpha_matting=True)
@@ -171,12 +138,10 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                         # cv2.waitKey(0)
 
                         if alpha_ratio > 0.3 and animal_image.shape[0] * animal_image.shape[1] > 50*50: #100*100:
-                            print(image_id)
                             species_segments[sp].append({'segment': animal_image, 'image_id': image_id})
                             i += 1
 
-    # after browsing training files
-    # read from input now n_augment = 1000
+    # Generate copy pasted training images
 
     for r in raw_sizes:
         raw_dir = experiment_dir + 'raw_' + str(r) + '/'
@@ -191,20 +156,14 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             pass
 
         for k in species_segments.keys():
-            # n_segments = len(species_segments[k])
             random.shuffle(species_segments[k])
             segments[k] = species_segments[k][:r]
-            print(k, len(segments[k]))
             for segment in segments[k]:
                 filename = segment['image_id']
-                print(filename)
-                #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
                 os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
                 os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
         for a in aug_factors:
-            print("raw %i, aug %i"%(r, a))
-
             augmented_dir = experiment_dir + 'augment_' + str(r) + '_' + str(a) + '/'
             try:
                 os.mkdir(augmented_dir)
@@ -220,16 +179,12 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 max_augmented = int(r*a / len(segments[k]))
                 if not max_augmented:
                     max_augmented = 1
-                print(k, n_segments, r*a, max_augmented)
 
                 j = 0
                 for segment in segments[k]:
                     animal_image = segment['segment']
                     n = j + max_augmented
-                    #for n in range(0, max_augmented): #random.randint(0, max_augmented)):
                     while j < n:
-
-                        #print(i, j)
                         n_rand = random.randint(0, len(empty_images)-1)
                         empty_image = cv2.imread(empty_images[n_rand])
                         s_img = animal_image.copy()
@@ -251,7 +206,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
                         s_img = ndimage.rotate(s_img, angle)
 
-                        # s_img = tighten_to_visible(s_img)
+                        s_img = tighten_to_visible(s_img)
 
                         if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0):
                             x_offset = random.randint(0, l_img.shape[1] - s_img.shape[1])
@@ -290,8 +245,6 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
                             str_ = '%i %f %f %f %f\n' % (classes[k], cx, cy, w_, h_)
                             open(augmented_dir + '/labels/' + str(classes[k]) + '_' + str(j) + '.txt', 'w').write(str_)
-                            # cv2.imshow('augment', l_img)
-                            # cv2.waitKey(0)
                             j += 1
 
             with open(experiment_dir + "augment_%i_%i.yaml"%(r, a), 'w') as yaml_file:

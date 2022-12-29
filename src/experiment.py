@@ -9,11 +9,7 @@ n = 1
 
 dataset_dir = "../data/serengeti_bboxes/"
 
-#experiment_dir = "../data/experiments/sample/"
-
-#experiment_dir = "../data/experiments/sample_uniform_elephant_cheetah_giraffe/"
-
-discard_file = "../data/discard.json"
+discard_file = "../discard.json"
 
 species_bbox_file = '../data/bbox_species.json'
 
@@ -87,38 +83,24 @@ def main(experiment_dir, n_images, selected_species):
     test_locations = locations[0:int(len(locations)/5)]
     train_locations = [loc for loc in locations if loc not in test_locations]
 
-    # Restrict to a few species?
-    #selected_species = ['elephant', 'wildebeest', 'giraffe']
-    #selected_species = ['giraffe']
-
-    # select n images per species
-    # taken as input
-    # n_images = 1000
-
     for sp in selected_species:
         individuals = [bbox for bbox in bbox_data if bbox['annotation']['location'] in train_locations and bbox['species'] == sp]
         images = [bbox['image_id'] for bbox in individuals]
         counts = Counter(images)
-
-        #print('species :', sp, '# :', len(individuals))
-        #print('        # images :', len(counts.keys()))
 
         n_total = len(individuals)
 
         shuffled = list(set(images))
         random.shuffle(shuffled)
 
-        # take 80% of the list considering # of individual per image
         n = sum(counts.values())
         i = 0
 
         if n < 10:
             continue
 
-        #while i/n < train_ratio: #0.01:
         while i < n_images and shuffled:
             train_set.append(shuffled[0])
-            # i += counts[shuffled[0]]
             i += 1
             shuffled = shuffled[1:]
 
@@ -153,14 +135,11 @@ def main(experiment_dir, n_images, selected_species):
 
         while i < n_images_val and shuffled: #0.020:
             val_set.append(shuffled[0])
-            # i += counts[shuffled[0]]
             i += 1
             shuffled = shuffled[1:]
 
         n_val_set = i
 
-        #print('  # train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
-        #print('  #train:', n_train_set, ' #val:', n_val_set, '#test :', n_test_set)
         species_counts.append({'species': sp, 'total': n_total, 'train': n_train_set, 'test': n_test_set, 'val' : n_val_set})
 
     print('# train:', len(train_set), ' # val:', len(val_set), '# test :', len(test_set))
@@ -177,14 +156,12 @@ def main(experiment_dir, n_images, selected_species):
     for image_id in test_set:
         filename = image_id.split('/')[-1]
         d = 'test/'
-        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
         os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
     for image_id in val_set:
         filename = image_id.split('/')[-1]
         d = 'val/'
-        #os.system("convert -size 640 %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'+filename+'.JPG'))
         os.system("cp %s %s"%(dataset_dir+'images/'+filename+'.JPG', experiment_dir+d+'images/'))
         os.system("cp %s %s"%(dataset_dir+'species_labels/'+filename+'.txt', experiment_dir+d+'labels/'))
 
@@ -204,20 +181,6 @@ def main(experiment_dir, n_images, selected_species):
         for k, v in species_classes.items():
             yaml_file.write("   %i: %s\n"%(v,k))
         yaml_file.close()
-
-    # with open(experiment_dir + "sbatch_train.sh", 'w') as file:
-    #     file.write("#!/bin/bash\n")
-    #     file.write("#SBATCH --partition=small\n")
-    #     file.write("#SBATCH --nodes=1\n")
-    #     file.write("#SBATCH --gres=gpu:1\n")
-    #     file.write("#SBATCH --mail-type=ALL\n")
-    #     file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
-    #     file.write("source ../../../../../../.profile\n")
-    #     file.write("source ../../../../darwin_venv/bin/activate\n")
-    #     file.write("echo 'training on trainset'\n")
-    #     file.write("python3 ../../../../lib/yolov5/train.py --epochs 10000 --data train.yaml --project train/runs/ --name train --batch 16\n")
-    #     file.write("\n")
-    #     file.close()
 
     print("next download empty images")
 

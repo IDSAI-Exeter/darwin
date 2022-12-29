@@ -56,6 +56,7 @@ def main(experiment_dir, n_images_per_locations):
 
     print("next augment dataset")
 
+
 if __name__=="__main__":
     import sys, getopt
 
