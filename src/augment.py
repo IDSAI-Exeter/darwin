@@ -1,6 +1,3 @@
-# call example
-# python3 generate_augmented_trainset.py -t ../data/experiments/sample_species -e ../data/empty_images/ -a ../data/experiments/sample_species/augmented
-
 import glob
 import os
 
@@ -72,7 +69,6 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
         classes = {v: k for k, v in data['names'].items()}
 
     json_data = None
-
     with open('../data/bbox_species.json') as json_file:
         json_data = json.load(json_file)
         json_file.close()
@@ -83,6 +79,13 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
     species_classes = json.load(open(species_file))
     #species_classes = classes
 
+    segments_data = None
+    with open('../segments.json') as json_file:
+        segments_data = json.load(json_file)
+        json_file.close()
+
+    high_quality = [segment['image_id'] for segment in segments_data if segment['quality'] == 'high']
+
     from collections import defaultdict
     species_segments = defaultdict(list)
 
@@ -92,6 +95,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
         print(sp)
         individuals = [bbox for bbox in bbox_data if bbox['annotation']['location'] in train_locations and bbox['species'] == sp]
         images = [bbox['image_id'] for bbox in individuals]
+        images = [image_id for image_id in images if image_id.split('/')[-1] in high_quality]
         counts = Counter(images)
 
         #print('species :', sp, '# :', len(individuals))
@@ -108,10 +112,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
         while i < n_segments and shuffled:
             image_id = shuffled[0]
             shuffled = shuffled[1:]
-            # for train_file in train_files: #[0:100]:
             image_id = image_id.split('/')[-1]
-
-            #filename = image_id.split('/')[-1]
 
             bboxes = [annot for annot in json_data if annot['image_id'].split('/')[-1] == image_id]
 
@@ -124,8 +125,6 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 r = 0.05
 
                 bx, by, bw, bh = x - w*r, y - h*r, w + w*2*r, h + h*2*r
-                #if x > 50 and y > 50 and x+w < bbox['image']['width'] - 50 and y+h < bbox['image']['height'] - 50:
-                #if bx > 50 and by > 50 and bx + bw < bbox['image']['width'] - 50 and by + bh < bbox['image']['height'] - 50:
                 if bx > 0 and by > 0 and bx + bw < bbox['image']['width'] and by + bh < bbox['image']['height'] - 200:
                     train_file = dataset_dir+'images/'+image_id+'.JPG'
                     image = None
@@ -272,9 +271,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                             #alpha_l = 1.0 - alpha_m
 
                             for c in range(0, 3):
-                                #l_img[y1:y2, x1:x2, c] = (alpha_m * s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
                                 l_img[y1:y2, x1:x2, c] = (alpha_s * s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
-                                # l_img[y1:y2, x1:x2, c] = ( s_img[:, :, c] + alpha_l * l_img[y1:y2, x1:x2, c])
 
 
                             # cv2.rectangle(l_img, (x1, y1), (x2, y2), (255, 0, 0), 3)
@@ -318,7 +315,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'training on %i * %i augmented trainset'\n"%(r, a))
-                file.write("python3 ../../../../lib/yolov5/train.py --epochs 10000 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
+                file.write("python3 ../../../../lib/yolov5/train.py --epochs 10000 --patience 300 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
                 file.write("\n")
                 file.close()
 
@@ -332,7 +329,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'resume training on %i * %i augmented trainset'\n"%(r, a))
-                file.write("python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 10000 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
+                file.write("python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 10000 --patience 300 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
                 file.write("\n")
                 file.close()
 
@@ -373,7 +370,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'training on %i raw trainset'\n" % r)
             file.write(
-                "python3 ../../../../lib/yolov5/train.py --epochs 10000 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
+                "python3 ../../../../lib/yolov5/train.py --epochs 10000 --patience 300 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
             file.write("\n")
             file.close()
 
@@ -388,7 +385,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'resume training on %i raw trainset'\n" % r)
             file.write(
-                "python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 10000 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
+                "python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 10000 --patience 300 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
             file.write("\n")
             file.close()
 
