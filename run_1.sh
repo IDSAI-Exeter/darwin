@@ -1,0 +1,3 @@
+source darwin_venv/bin/activate
+cd src/
+python3 montecarlo.py -e ../data/experiments/montecarlo -r 1 -a 1,2,4,8 -n 10 -k 10 -s elephant,eland,topi,ostrich,reedbuck,baboon,lionfemale,warthog,waterbuck,zebra,lionmale,hippopotamus,hartebeest,dikdik,hyenaspotted,monkeyvervet,cheetah,gazellegrants,koribustard,jackal,bushbuck,buffalo,guineafowl,wildebeest,impala,gazellethomsons,leopard,serval,aardvark,otherbird,mongoose,giraffe
