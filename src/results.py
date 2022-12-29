@@ -57,6 +57,7 @@ def main(dir, raw_sizes, aug_factors):
 
     species_list = list(dfs[0]['Class'])[1:]
     df_species = pd.DataFrame(deltas_species)
+    print(df_species)
     df_species.columns = species_list
     print(df_species)
     print(df_species.mean(axis=0))
