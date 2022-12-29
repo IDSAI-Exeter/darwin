@@ -192,7 +192,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
                         x_offset = y_offset = 50
 
-                        scale_percent = random.randint(80, 200)
+                        scale_percent = random.randint(95, 105)
                         width = int(s_img.shape[1] * scale_percent / 100)
                         height = int(s_img.shape[0] * scale_percent / 100)
                         dim = (width, height)
@@ -202,7 +202,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
 
                         s_img = cv2.resize(s_img, dim)
 
-                        angle = random.randint(-30, 30)
+                        angle = random.randint(-5, 5)
 
                         s_img = ndimage.rotate(s_img, angle)
 
@@ -211,10 +211,11 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                         if (l_img.shape[1] - s_img.shape[1] > 0) and (l_img.shape[0] - s_img.shape[0] > 0):
                             x_offset = random.randint(0, l_img.shape[1] - s_img.shape[1])
                             y_min = 0
+                            y_banner = 100
                             if (l_img.shape[0]/2.0 - s_img.shape[0]) > 0:
                                 y_min = l_img.shape[0]/2.0 - s_img.shape[0]
 
-                            y_offset = random.randint(y_min, l_img.shape[0] - s_img.shape[0])
+                            y_offset = random.randint(y_min, l_img.shape[0] - s_img.shape[0] - y_banner)
 
                             y1, y2 = y_offset, y_offset + s_img.shape[0]
                             x1, x2 = x_offset, x_offset + s_img.shape[1]
