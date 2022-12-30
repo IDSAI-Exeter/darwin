@@ -68,11 +68,12 @@ if __name__ == "__main__":
 
     experiment_dir = ''
     argv = sys.argv[1:]
+    aug_factors = [1, 2, 4]
 
     try:
-        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+        opts, args = getopt.getopt(argv, "he:a:", ["experiment_dir=", "aug_factors="])
     except getopt.GetoptError:
-        print('script.py -e <experiment_dir>')
+        print('script.py -e <experiment_dir> -a <aug_factors>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
@@ -80,9 +81,11 @@ if __name__ == "__main__":
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
+        elif opt in ("-a", "--aug_factors"):
+            aug_factors = [int(s.strip().lower()) for s in arg.split(',')]
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", [1], [1, 2, 4])
+    main(experiment_dir + "results/", [1], aug_factors)
