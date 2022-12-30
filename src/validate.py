@@ -24,4 +24,25 @@ def main(dir):
 
 
 if __name__ == "__main__":
-    main("../data/experiments/montecarlo/")
+    import sys, getopt
+
+    experiment_dir = ''
+    argv = sys.argv[1:]
+
+    try:
+        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+    except getopt.GetoptError:
+        print('script.py -e <experiment_dir>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('script.py -e <experiment_dir>')
+            sys.exit()
+        elif opt in ("-e", "--experiment_dir"):
+            experiment_dir = arg
+
+    if not experiment_dir[-1] == '/':
+        experiment_dir += '/'
+
+    # main("../data/experiments/montecarlo/")
+    main(experiment_dir)

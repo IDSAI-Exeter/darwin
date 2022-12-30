@@ -125,7 +125,29 @@ def main(experiment_dir, n_augment, timings):
 if __name__ == "__main__":
     #timestamps = [13, 141, 134, 16, 108, 25, 111]
     #main('projects/darwin/data/experiments/ewg/', 200, timestamps)
+
+    import sys, getopt
+
+    experiment_dir = ''
+    argv = sys.argv[1:]
+
+    try:
+        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+    except getopt.GetoptError:
+        print('script.py -e <experiment_dir>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('script.py -e <experiment_dir>')
+            sys.exit()
+        elif opt in ("-e", "--experiment_dir"):
+            experiment_dir = arg
+
+    if not experiment_dir[-1] == '/':
+        experiment_dir += '/'
+
     timings = [13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7]
     timings = [35, 41]
-    main('projects/darwin/data/experiments/montecarlo/', 1, timings)
+    # main('projects/darwin/data/experiments/montecarlo_/', 1, timings)
+    main(experiment_dir, 1, timings)
     os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")

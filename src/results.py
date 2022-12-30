@@ -64,4 +64,25 @@ def main(dir, raw_sizes, aug_factors):
     print(df_species.mean(axis=0))
 
 if __name__ == "__main__":
-    main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
+    import sys, getopt
+
+    experiment_dir = ''
+    argv = sys.argv[1:]
+
+    try:
+        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+    except getopt.GetoptError:
+        print('script.py -e <experiment_dir>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('script.py -e <experiment_dir>')
+            sys.exit()
+        elif opt in ("-e", "--experiment_dir"):
+            experiment_dir = arg
+
+    if not experiment_dir[-1] == '/':
+        experiment_dir += '/'
+
+    # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
+    main(experiment_dir + "results/", [1], [1, 2, 4])

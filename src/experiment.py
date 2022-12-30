@@ -194,7 +194,7 @@ if __name__ == "__main__":
     species = []
 
     try:
-        opts, args = getopt.getopt(argv, "he:i:s:", ["experiment_dir=", "n_images=", "species="])
+        opts, args = getopt.getopt(argv, "he:n:s:", ["experiment_dir=", "n_images=", "species="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir> -n <n_images> -s <species>')
         sys.exit(2)
