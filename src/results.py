@@ -52,8 +52,9 @@ def main(dir, raw_sizes, aug_factors):
 
     df = pd.DataFrame(deltas)
     df.columns = [str(i) for i in aug_factors]
-    print(df.mean())
-    print(df.std()/math.sqrt(len(df)))
+    print(df)
+    print('mean', df.mean())
+    print('std err', df.std()/math.sqrt(len(df)))
 
     species_list = list(dfs[0]['Class'])[1:]
     df_species = pd.DataFrame(deltas_species)
