@@ -11,7 +11,7 @@ def main(experiment_dir, n_augment, timings):
     l = []
 
     for i in range(1, k+1):
-        print(experiment_dir + "fold_%i"%(n_augment+i))
+        print(experiment_dir + "fold_%i"%(10+i))
         l += [('t', "%sfold_%i/raw_1/runs/raw/results.csv"%(experiment_dir, 10+i), 10+i)]
         l += [('a', "%sfold_%i/augment_1_%i/runs/augment/results.csv"%(experiment_dir, 10+i, n_augment), 10+i)]
 

@@ -370,11 +370,11 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(argv, "he:r:a:s:", ["experiment_dir=", "raw_sizes=", "aug_factors=", "species="])
     except getopt.GetoptError:
-        print('script.py -e <experiment_dir> -i <n_images> -s <species>')
+        print('script.py -e <experiment_dir> -r <raw_sizes> -a <aug_factors> -s <species>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('script.py -e <experiment_dir> -i <n_images> -s <species>')
+            print('script.py -e <experiment_dir> -r <raw_sizes> -a <aug_factors> -s <species>')
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
