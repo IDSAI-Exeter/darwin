@@ -269,7 +269,8 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'training on %i * %i augmented trainset'\n"%(r, a))
-                file.write("python3 ../../../../lib/yolov5/train.py --epochs 10000 --patience 300 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
+                # file.write("python3 ../../../../lib/yolov5/train.py --epochs 10000 --patience 300 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
+                file.write("python3 ../../../../lib/yolov5/train.py --epochs 300 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
                 file.write("\n")
                 file.close()
 
@@ -323,8 +324,8 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("source ../../../../../../.profile\n")
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'training on %i raw trainset'\n" % r)
-            file.write(
-                "python3 ../../../../lib/yolov5/train.py --epochs 10000 --patience 300 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
+            # file.write("python3 ../../../../lib/yolov5/train.py --epochs 10000 --patience 300 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
+            file.write("python3 ../../../../lib/yolov5/train.py --epochs 300 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
             file.write("\n")
             file.close()
 
