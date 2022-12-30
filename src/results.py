@@ -63,7 +63,7 @@ def main(dir, raw_sizes, aug_factors):
     df_species = pd.DataFrame(deltas_species)
     # print(df_species)
     df_species.columns = species_list
-    print(df_species)
+    print(df_species.T)
     print(df_species.mean(axis=0))
 
 if __name__ == "__main__":
