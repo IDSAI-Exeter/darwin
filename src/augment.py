@@ -28,6 +28,8 @@ def tighten_to_visible(img):
 
 def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_species):
 
+    fold = experiment_dir.split('/')[-1]
+
     n_segments = max(raw_sizes)
 
     train_locations_file = experiment_dir + 'train_locations.json'
@@ -185,6 +187,11 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                     animal_image = segment['segment']
                     n = j + max_augmented
                     while j < n:
+
+                        # This would be where to do a proper selection of the empty images based
+                        # on time of day of the segment and time of day of the empty image
+                        # this can be done as a list comprehension on empty_images and using annotations
+
                         n_rand = random.randint(0, len(empty_images)-1)
                         empty_image = cv2.imread(empty_images[n_rand])
                         s_img = animal_image.copy()
@@ -284,7 +291,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'resume training on %i * %i augmented trainset'\n"%(r, a))
-                file.write("python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 10000 --patience 300 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
+                file.write("python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 300 --data augment_%i_%i.yaml --project augment_%i_%i/runs/ --name augment --batch 16\n"%(r, a, r, a))
                 file.write("\n")
                 file.close()
 
@@ -299,7 +306,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'validate(%i * %i) augmented trainset'\n"%(r, a))
-                file.write("python3 ../../../../lib/yolov5/val.py --data augment_%i_%i.yaml --weights augment_%i_%i/runs/augment/weights/best.pt --project validate/ --save-txt --verbose\n"%(r, a, r, a))
+                file.write("python3 ../../../../lib/yolov5/val.py --data augment_%i_%i.yaml --weights augment_%i_%i/runs/augment/weights/best.pt --project validate/ --verbose --task test 2> ../results/%s_augment_%i_%i.out\n"%(r, a, r, a, fold, r, a))
                 file.write("\n")
                 file.close()
 
@@ -340,7 +347,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'resume training on %i raw trainset'\n" % r)
             file.write(
-                "python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 10000 --patience 300 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
+                "python3 ../../../../lib/yolov5/train.py --resume --exist-ok --epochs 300 --data raw_%i.yaml --project raw_%i/runs/ --name raw --batch 16\n"%(r, r))
             file.write("\n")
             file.close()
 
@@ -355,7 +362,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("source ../../../../../../.profile\n")
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'validate(%i) raw trainset'\n"%r)
-            file.write("python3 ../../../../lib/yolov5/val.py --data raw_%i.yaml --weights raw_%i/runs/raw/weights/best.pt --project validate/ --save-txt --verbose\n"%(r, r))
+            file.write("python3 ../../../../lib/yolov5/val.py --data raw_%i.yaml --weights raw_%i/runs/raw/weights/best.pt --project validate/ --verbose --task test 2> ../results/%s_raw_%i.out\n"%(r, r, fold, r))
             file.write("\n")
             file.close()
 
