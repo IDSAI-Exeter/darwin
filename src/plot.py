@@ -167,9 +167,9 @@ if __name__ == "__main__":
     timings = [35, 41]
     # main('projects/darwin/data/experiments/montecarlo_/', 1, timings)
     # main(experiment_dir, 1, timings)
-    timings = [35, 41, 60, 90]
+    timings = [35, 44, 52, 67]
     raw_size = 1
     aug_factors = [1, 2, 4]
-    k = 5
+    k = 10
     main(experiment_dir, k, aug_factors, timings, raw_size)
     os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
