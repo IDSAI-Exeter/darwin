@@ -163,14 +163,30 @@ if __name__ == "__main__":
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
 
-    timings = [13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7]
-    timings = [35, 41]
+    # timings = [13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7, 13*60+8, 33*60+7]
+    # timings = [35, 41]
     # main('projects/darwin/data/experiments/montecarlo_/', 1, timings)
     # main(experiment_dir, 1, timings)
+
     timings = [35, 44, 52, 67, 80]
+
+    timings = []
+    # timings raw 1
+    timings.append([35, 44, 52, 67, 120])
+    # timings raw 2
+    timings.append([60, 76, 93, 130, 197])
+    # timings raw 4
+    timings.append([81, 117, 151, 225, 369])
+    # timings raw 8
+    timings.append([120, 188, 261, 407, 700])
+
     raw_size = 8
+    raw_sizes = [1, 2, 4, 8]
     aug_factors = [1, 2, 4, 8]
     k = 1
-    main(experiment_dir, k, aug_factors, timings, raw_size, False)
-    os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
-    os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
+
+    for i in range(0, len(raw_sizes)):
+        raw_size = raw_sizes[i]
+        main(experiment_dir, k, aug_factors, timings[i], raw_size, False)
+        os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
+        os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
