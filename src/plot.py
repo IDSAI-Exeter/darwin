@@ -4,16 +4,15 @@ import os
 import pandas
 
 
-def main(experiment_dir, k, aug_factors, timings, raw_size):
+def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
 
     l = []
-
-    download = True
 
     if download:
         for i in range(1, k+1):
             print(experiment_dir + "fold_%i"%(10+i))
             l += [('raw', "%sfold_%i/raw_%i/runs/raw/results.csv"%(experiment_dir, 10+i, raw_size), 10+i)]
+            l += [('raw', "%sfold_%i/raw_%i/runs/raw2/results.csv"%(experiment_dir, 10+i, raw_size), 10+i)]
             for j in aug_factors:
                 l += [('a_%i'%j, "%sfold_%i/augment_%i_%i/runs/augment/results.csv"%(experiment_dir, 10+i, raw_size, j), 10+i)]
                 l += [('a_%i'%j, "%sfold_%i/augment_%i_%i/runs/augment2/results.csv"%(experiment_dir, 10+i, raw_size, j), 10+i)]
@@ -114,7 +113,7 @@ def main(experiment_dir, k, aug_factors, timings, raw_size):
     kfold['raw_%i'%raw_size].plot(ax=ax, x='cumtime', y='raw_%i'%raw_size, linestyle='solid', color='black', title='%i-fold Monte Carlo cross validation mean mAP per epoch'%k)
     plt.fill_between(color='lightgray', x=kfold['raw_%i'%raw_size]['cumtime'], y1=kfold['raw_%i'%raw_size]['raw_%i'%raw_size] - kfold['raw_%i'%raw_size]['std']/(2*math.sqrt(k)), y2=kfold['raw_%i'%raw_size]['raw_%i'%raw_size] + kfold['raw_%i'%raw_size]['std']/(2*math.sqrt(k)))
 
-    linestyles = ['dashed', 'dashdot', 'dotted', 'dashdotted']
+    linestyles = ['dashed', 'dashdot', 'dotted', '--']
     # styles = {1 : 0, 2 : 1, 4 : 2, 8 : 3}
     styles = {i: j for i, j in zip(aug_factors, range(len(aug_factors)))}
 
@@ -169,8 +168,9 @@ if __name__ == "__main__":
     # main('projects/darwin/data/experiments/montecarlo_/', 1, timings)
     # main(experiment_dir, 1, timings)
     timings = [35, 44, 52, 67, 80]
-    raw_size = 1
+    raw_size = 8
     aug_factors = [1, 2, 4, 8]
-    k = 3
-    main(experiment_dir, k, aug_factors, timings, raw_size)
+    k = 1
+    main(experiment_dir, k, aug_factors, timings, raw_size, False)
     os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
+    os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
