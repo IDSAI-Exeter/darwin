@@ -1,6 +1,9 @@
 import glob
+import os
 import pandas as pd
 import math
+
+download = False
 
 
 def parse(f):
@@ -27,7 +30,18 @@ def parse(f):
     else:
         return None
 
+
 def main(dir, raw_sizes, aug_factors):
+
+    try:
+        os.mkdir(results)
+    except:
+        pass
+    if download:
+        os.system(
+            "scp -r -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s results/"%dir)
+
+    dir = "results/"
     raw = None
     deltas = []
     deltas_species = []
@@ -35,15 +49,17 @@ def main(dir, raw_sizes, aug_factors):
     dfs = []
     for fold in ["fold_" + str(i) for i in range(11, 21)]:
         delta = []
-        for r in ["raw_" + str(i) for i in raw_sizes]:
+        for j in raw_sizes:
+            r = "raw_" + str(j)
+            # for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
             if raw is not None:
                 dfs.append(raw)
-                for test in ["augment_1_" + str(i) for i in aug_factors]:
+                for test in ["augment_%i_"%j + str(i) for i in aug_factors]:
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     if augment is not None:
                         delta.append(float(augment.iloc[0]['mAP50-95']) - float(raw.iloc[0]['mAP50-95']))
-                        if test == "augment_1_1":# and len(augment) == 32:
+                        if test == "augment_%i_1"%j and len(augment) == 46:
                             species = []
                             for i in range(1, len(augment)):
                                 # species_list.append(augment.iloc[i]['Class'])
@@ -74,9 +90,10 @@ if __name__ == "__main__":
     experiment_dir = ''
     argv = sys.argv[1:]
     aug_factors = [1, 2, 4]
+    raw_sizes = [1]
 
     try:
-        opts, args = getopt.getopt(argv, "he:a:", ["experiment_dir=", "aug_factors="])
+        opts, args = getopt.getopt(argv, "he:a:r:", ["experiment_dir=", "aug_factors="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir> -a <aug_factors>')
         sys.exit(2)
@@ -88,9 +105,11 @@ if __name__ == "__main__":
             experiment_dir = arg
         elif opt in ("-a", "--aug_factors"):
             aug_factors = [int(s.strip().lower()) for s in arg.split(',')]
+        elif opt in ("-r", "--raw_sizes"):
+            raw_sizes = [int(s.strip().lower()) for s in arg.split(',')]
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", [1], aug_factors)
+    main(experiment_dir + "results/", raw_sizes, aug_factors)
