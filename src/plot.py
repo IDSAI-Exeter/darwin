@@ -178,7 +178,7 @@ if __name__ == "__main__":
     # timings raw 4
     timings.append([81, 117, 151, 225, 369])
     # timings raw 8
-    timings.append([120, 188, 261, 407, 700])
+    timings.append([120, 188, 261, 407, 682])
 
     raw_size = 8
     raw_sizes = [1, 2, 4, 8]
@@ -187,6 +187,6 @@ if __name__ == "__main__":
 
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]
-        main(experiment_dir, k, aug_factors, timings[i], raw_size, False)
+        main(experiment_dir, k, aug_factors, timings[i], raw_size, download=False)
         os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
         os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
