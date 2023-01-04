@@ -183,7 +183,7 @@ if __name__ == "__main__":
     raw_size = 8
     raw_sizes = [1, 2, 4, 8]
     aug_factors = [1, 2, 4, 8]
-    k = 1
+    k = 4
 
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]
