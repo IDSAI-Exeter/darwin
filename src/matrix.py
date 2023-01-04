@@ -7,6 +7,7 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib
 import seaborn
+plt.rcParams["figure.figsize"] = (10, 7)
 
 
 def parse(f):
@@ -127,7 +128,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     print(df_species)
     plt.clf()
-    sns.set(rc={'figure.figsize': (80, 80)})
+    # sns.set(rc={'figure.figsize': (80, 80)})
     matplotlib.rc('ytick', labelsize=8)
     ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
     ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
@@ -167,5 +168,5 @@ if __name__ == "__main__":
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", raw_sizes, aug_factors, download=False, k=2)
-    os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m ")
+    main(experiment_dir + "results/", raw_sizes, aug_factors, download=False, k=1)
+    os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
