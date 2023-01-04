@@ -1,7 +1,9 @@
 # TBC
 import os
-
 import pandas
+import pandas as pd
+import matplotlib.pyplot as plt
+plt.rcParams["figure.figsize"] = (10, 7)
 
 
 def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
@@ -9,6 +11,8 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     l = []
 
     if download:
+        os.system("rm -rf csv/")
+        os.mkdir("csv")
         for i in range(1, k+1):
             print(experiment_dir + "fold_%i"%(10+i))
             l += [('raw', "%sfold_%i/raw_%i/runs/raw/results.csv"%(experiment_dir, 10+i, raw_size), 10+i)]
@@ -20,9 +24,6 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
         for t, f, i in l:
             os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(f, i, raw_size, t))
             print("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(f, i, raw_size, t))
-
-    import pandas as pd
-    import matplotlib.pyplot as plt
 
     dfs = []
     i_ = [10 + i for i in range(1, k+1)]
@@ -190,3 +191,4 @@ if __name__ == "__main__":
         main(experiment_dir, k, aug_factors, timings[i], raw_size, download=False)
         os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
         os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
+        os.system("git add ../plots/montecarlo_*;git commit -m 'training results update'; git push")

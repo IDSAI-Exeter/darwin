@@ -41,10 +41,11 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     except:
         pass
     if download:
+        os.system("rm -rf results/")
         os.system(
-            "scp -r -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s results/"%dir)
+            "scp -r -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s ."%dir)
 
-    dir = "results/results/"
+    dir = "results/"
     raw = None
     deltas = []
     species_list = None
@@ -56,6 +57,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
         r_index = 0
         for j in raw_sizes:
             r = "raw_" + str(j)
+            print(r, r_index)
             # for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
             if raw is not None:
@@ -63,8 +65,10 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
                 delta = []
                 for a in aug_factors:
                     test = "augment_%i_"%j + str(a)
+                    print(test)
                     augment = parse(dir + "%s_%s.out"%(fold, test))
                     if augment is not None:
+                        print((j, a))
                         delta.append(float(augment.iloc[0]['mAP50-95']) - float(raw.iloc[0]['mAP50-95']))
                         if len(augment) == 46:
                             species = []
@@ -72,9 +76,9 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
                                 # species_list.append(augment.iloc[i]['Class'])
                                 species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
                             deltas_species[(j, a)].append(species)
-
                 deltas.append(delta)
                 deltas_matrix[r_index].append(delta)
+                # print(deltas_matrix)
             r_index += 1
 
     matrix = pd.DataFrame()
@@ -82,6 +86,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     for r in range(len(raw_sizes)):
         df = pd.DataFrame(deltas_matrix[r])
+        print(df)
         df.columns = [str(i) for i in aug_factors]
         # print("mean mAP delta r=%i"%r, df.mean())
         matrix[raw_sizes[r]] = df.mean()
@@ -92,7 +97,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     import seaborn as sns
     # RdYlGn
-    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': 'mean mAP delta'})
+    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
     ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
     plt.savefig('../plots/matrix.png')
     # plt.show()
@@ -124,7 +129,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     plt.clf()
     sns.set(rc={'figure.figsize': (80, 80)})
     matplotlib.rc('ytick', labelsize=8)
-    ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': 'mean mAP delta'})
+    ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
     ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
     plt.tight_layout()
     plt.savefig('../plots/species.png')
@@ -162,4 +167,5 @@ if __name__ == "__main__":
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", raw_sizes, aug_factors, download=False, k=3)
+    main(experiment_dir + "results/", raw_sizes, aug_factors, download=False, k=2)
+    os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m ")
