@@ -86,22 +86,23 @@ def main(dir, raw_sizes, aug_factors, download=False):
     print(std)
 
     import seaborn as sns
-    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="coolwarm", cbar_kws={'label': 'mean mAP delta'})
-    ax.set(xlabel="# raw images", ylabel="aug factor")
+    # RdYlGn
+    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': 'mean mAP delta'})
+    ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
     plt.savefig('../plots/matrix.png')
-    plt.show()
+    # plt.show()
 
-    exit()
+    # exit()
 
-    df = pd.DataFrame(deltas)
-    print(df)
-    df.columns = [str(i) for i in aug_factors]
-    print(df)
-    summary = pd.DataFrame()
-    summary['mean'] = df.mean()
-    summary['std err'] = df.std()/math.sqrt(len(df))
+    # df = pd.DataFrame(deltas)
+    # print(df)
+    # df.columns = [str(i) for i in aug_factors]
+    # print(df)
+    # summary = pd.DataFrame()
+    # summary['mean'] = df.mean()
+    # summary['std err'] = df.std()/math.sqrt(len(df))
 
-    print(summary)
+    # print(summary)
 
     species_list = list(dfs[0]['Class'])[1:]
     df_species = pd.DataFrame(deltas_species)
