@@ -147,9 +147,9 @@ if __name__ == "__main__":
     argv = sys.argv[1:]
     aug_factors = [1, 2, 4]
     raw_sizes = [1]
-
+    k = 1
     try:
-        opts, args = getopt.getopt(argv, "he:a:r:", ["experiment_dir=", "aug_factors="])
+        opts, args = getopt.getopt(argv, "he:a:r:k:", ["experiment_dir=", "aug_factors=", "raw_sizes=", "k-groups="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir> -a <aug_factors>')
         sys.exit(2)
@@ -163,10 +163,12 @@ if __name__ == "__main__":
             aug_factors = [int(s.strip().lower()) for s in arg.split(',')]
         elif opt in ("-r", "--raw_sizes"):
             raw_sizes = [int(s.strip().lower()) for s in arg.split(',')]
+        elif opt in ("-k", "--k-groups"):
+            k = int(arg)
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", raw_sizes, aug_factors, download=False, k=1)
-    os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
+    main(experiment_dir + "results/", raw_sizes, aug_factors, False, k)
+    # os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
