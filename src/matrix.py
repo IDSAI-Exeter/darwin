@@ -102,8 +102,10 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     plt.savefig('../plots/matrix.png')
 
     plt.clf()
+    # import matplotlib as mpl
+    # norm = mpl.colors.Normalize(vmin=0.001, vmax=0.007)
     # RdYlGn
-    ax = sns.heatmap(std, annot=True, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "standard error of the mean mAP delta over %i fold(s)"%k})
+    ax = sns.heatmap(std, annot=True, fmt=".7f", center=0, cmap="gray_r", cbar_kws={'label': "standard error of the mean mAP delta over %i fold(s)"%k})
     ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
     plt.savefig('../plots/matrix-std.png')
     # plt.show()
