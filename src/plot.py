@@ -148,9 +148,10 @@ if __name__ == "__main__":
 
     experiment_dir = ''
     argv = sys.argv[1:]
+    k = 1
 
     try:
-        opts, args = getopt.getopt(argv, "he:", ["experiment_dir="])
+        opts, args = getopt.getopt(argv, "he:k:", ["experiment_dir=", "k-groups="])
     except getopt.GetoptError:
         print('script.py -e <experiment_dir>')
         sys.exit(2)
@@ -160,6 +161,8 @@ if __name__ == "__main__":
             sys.exit()
         elif opt in ("-e", "--experiment_dir"):
             experiment_dir = arg
+        elif opt in ("-k", "--k-groups"):
+            k = int(arg)
 
     if not experiment_dir[-1] == '/':
         experiment_dir += '/'
@@ -184,7 +187,6 @@ if __name__ == "__main__":
     raw_size = 8
     raw_sizes = [1, 2, 4, 8]
     aug_factors = [1, 2, 4, 8]
-    k = 1
 
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]

@@ -171,4 +171,4 @@ if __name__ == "__main__":
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
     main(experiment_dir + "results/", raw_sizes, aug_factors, True, k)
-    # os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
+    os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
