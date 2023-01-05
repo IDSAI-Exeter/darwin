@@ -50,7 +50,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     raw = None
     deltas = []
     species_list = None
-    dfs = []
+    dfs = {}
     deltas_matrix = [[] for r in raw_sizes]
     deltas_species = {(r, a): [] for r in raw_sizes for a in aug_factors}
 
@@ -62,7 +62,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
             # for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
             if raw is not None:
-                dfs.append(raw)
+                dfs[j] = raw
                 delta = []
                 for a in aug_factors:
                     test = "augment_%i_"%j + str(a)
@@ -71,12 +71,12 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
                     if augment is not None:
                         print((j, a))
                         delta.append(float(augment.iloc[0]['mAP50-95']) - float(raw.iloc[0]['mAP50-95']))
-                        if len(augment) == 46:
-                            species = []
-                            for i in range(1, len(augment)):
-                                # species_list.append(augment.iloc[i]['Class'])
-                                species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
-                            deltas_species[(j, a)].append(species)
+                        # if len(augment) == 46:
+                        species = []
+                        for i in range(1, len(augment)):
+                            # species_list.append(augment.iloc[i]['Class'])
+                            species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
+                        deltas_species[(j, a)].append(species)
                 deltas.append(delta)
                 deltas_matrix[r_index].append(delta)
                 # print(deltas_matrix)
@@ -87,11 +87,10 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     for r in range(len(raw_sizes)):
         df = pd.DataFrame(deltas_matrix[r])
-        print(df)
         df.columns = [str(i) for i in aug_factors]
         # print("mean mAP delta r=%i"%r, df.mean())
         matrix[raw_sizes[r]] = df.mean()
-        std[raw_sizes[r]] = df.std()
+        std[raw_sizes[r]] = df.std()/math.sqrt(k)
 
     print(matrix)
     print(std)
@@ -101,6 +100,12 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
     ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
     plt.savefig('../plots/matrix.png')
+
+    plt.clf()
+    # RdYlGn
+    ax = sns.heatmap(std, annot=True, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "standard error of the mean mAP delta over %i fold(s)"%k})
+    ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
+    plt.savefig('../plots/matrix-std.png')
     # plt.show()
 
     # exit()
@@ -115,16 +120,18 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     # print(summary)
 
-    species_list = list(dfs[0]['Class'])[1:]
     species_columns = [(r, a) for r in raw_sizes for a in aug_factors]
     df_species = pd.DataFrame()
 
     for (r, a) in deltas_species.keys():
         # print((r, a))
+        species_list = list(dfs[r]['Class'])[1:]
         df = pd.DataFrame(deltas_species[(r, a)])
         df.columns = species_list
         # print(df)
-        df_species[str((r, a))] = df.mean(axis=0)
+        mean = pd.DataFrame(df.mean(axis=0))
+        mean.columns = [str((r, a))]
+        df_species = pd.merge(df_species, mean, how='outer', left_index = True, right_index = True)
 
     print(df_species)
     plt.clf()
@@ -139,6 +146,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     # transpose.columns = deltas_species_columns
     # print(transpose)
     # print(df_species.mean(axis=0))
+
 
 if __name__ == "__main__":
     import sys, getopt
@@ -170,5 +178,5 @@ if __name__ == "__main__":
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", raw_sizes, aug_factors, True, k)
-    os.system("git add ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
+    main(experiment_dir + "results/", raw_sizes, aug_factors, False, k)
+    os.system("git add ../plots/matrix-std.png ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
