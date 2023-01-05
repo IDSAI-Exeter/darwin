@@ -1,6 +1,6 @@
-# darwin
+# Darwin
 
-Species identification for camera-trap images.
+Species identification accuracy optimisation with automated copy-pasting for camera-trap images.
 
 
 # Run
@@ -23,5 +23,6 @@ sh run.sh
 ## Test results
 
 ![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/matrix.png?raw=true "mean test results")
+![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/matrix-std.png?raw=true "mean std error")
 ![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/species.png?raw=true "test results on species")
 
