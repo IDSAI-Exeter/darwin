@@ -62,7 +62,6 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
             # for r in ["raw_" + str(i) for i in raw_sizes]:
             raw = parse(dir + "%s_%s.out"%(fold, r))
             if raw is not None:
-                dfs[j] = raw
                 delta = []
                 for a in aug_factors:
                     test = "augment_%i_"%j + str(a)
@@ -77,6 +76,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
                             # species_list.append(augment.iloc[i]['Class'])
                             species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
                         deltas_species[(j, a)].append(species)
+                        dfs[(j, a)] = augment
                 deltas.append(delta)
                 deltas_matrix[r_index].append(delta)
                 # print(deltas_matrix)
@@ -127,7 +127,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     for (r, a) in deltas_species.keys():
         # print((r, a))
-        species_list = list(dfs[r]['Class'])[1:]
+        species_list = list(dfs[(r, a)]['Class'])[1:]
         df = pd.DataFrame(deltas_species[(r, a)])
         df.columns = species_list
         # print(df)
