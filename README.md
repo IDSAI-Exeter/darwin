@@ -26,3 +26,8 @@ sh run.sh
 ![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/matrix-std.png?raw=true "mean std error")
 ![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/species.png?raw=true "test results on species")
 
+# Results of 500,1 run
+
+## Training results
+
+![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/montecarlo_500.png?raw=true "training results on 500 images per species")
