@@ -11,6 +11,13 @@ sh download.sh
 
 sh run.sh
 
+Once the training is over :
+
+sh validate.sh
+
+sh plot.sh
+
+
 # Results of 1,2,4,8 runs are found below
 
 ## Training results
