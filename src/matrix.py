@@ -48,7 +48,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     if download:
         os.system("rm -rf results/")
         os.system(
-            "scp -r -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s ."%(config['jade_account'], dir))
+            "scp -r -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s ."%(config['jade_home'], config['jade_account'], dir))
 
     dir = "results/"
     raw = None

@@ -24,8 +24,8 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
                 l += [('a_%i'%j, "%sfold_%i/augment_%i_%i/runs/augment2/results.csv"%(experiment_dir, 10+i, raw_size, j), 10+i)]
 
         for t, f, i in l:
-            os.system("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], f, i, raw_size, t))
-            print("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], f, i, raw_size, t))
+            os.system("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], config['jade_home'],  f, i, raw_size, t))
+            print("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], config['jade_home'], f, i, raw_size, t))
 
     dfs = []
     i_ = [10 + i for i in range(1, k+1)]
