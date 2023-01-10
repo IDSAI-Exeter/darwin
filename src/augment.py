@@ -9,6 +9,8 @@ from rembg import remove
 from PIL import Image
 import numpy as np
 from collections import Counter
+import json
+config = json.load(open('../config.json'))
 
 dataset_dir = "../data/serengeti_bboxes/"
 
@@ -272,7 +274,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("#SBATCH --nodes=1\n")
                 file.write("#SBATCH --gres=gpu:1\n")
                 file.write("#SBATCH --mail-type=ALL\n")
-                file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+                file.write("#SBATCH --mail-user=%s\n"%config['email'])
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'training on %i * %i augmented trainset'\n"%(r, a))
@@ -287,7 +289,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("#SBATCH --nodes=1\n")
                 file.write("#SBATCH --gres=gpu:1\n")
                 file.write("#SBATCH --mail-type=ALL\n")
-                file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+                file.write("#SBATCH --mail-user=%s\n"%config['email'])
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
                 file.write("echo 'resume training on %i * %i augmented trainset'\n"%(r, a))
@@ -301,7 +303,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
                 file.write("#SBATCH --nodes=1\n")
                 file.write("#SBATCH --gres=gpu:1\n")
                 file.write("#SBATCH --mail-type=ALL\n")
-                file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+                file.write("#SBATCH --mail-user=%s\n"%config['email'])
                 file.write("#SBATCH --output=validate-%j.out\n")
                 file.write("source ../../../../../../.profile\n")
                 file.write("source ../../../../darwin_venv/bin/activate\n")
@@ -327,7 +329,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("#SBATCH --nodes=1\n")
             file.write("#SBATCH --gres=gpu:1\n")
             file.write("#SBATCH --mail-type=ALL\n")
-            file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+            file.write("#SBATCH --mail-user=%s\n"%config['email'])
             file.write("source ../../../../../../.profile\n")
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'training on %i raw trainset'\n" % r)
@@ -342,7 +344,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("#SBATCH --nodes=1\n")
             file.write("#SBATCH --gres=gpu:1\n")
             file.write("#SBATCH --mail-type=ALL\n")
-            file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+            file.write("#SBATCH --mail-user=%s\n"%config['email'])
             file.write("source ../../../../../../.profile\n")
             file.write("source ../../../../darwin_venv/bin/activate\n")
             file.write("echo 'resume training on %i raw trainset'\n" % r)
@@ -357,7 +359,7 @@ def main(experiment_dir, empty_imgs_dir, raw_sizes, aug_factors, selected_specie
             file.write("#SBATCH --nodes=1\n")
             file.write("#SBATCH --gres=gpu:1\n")
             file.write("#SBATCH --mail-type=ALL\n")
-            file.write("#SBATCH --mail-user=cedric.mesnage@gmail.com\n")
+            file.write("#SBATCH --mail-user=%s\n"%config['email'])
             file.write("#SBATCH --output=validate-%j.out\n")
             file.write("source ../../../../../../.profile\n")
             file.write("source ../../../../darwin_venv/bin/activate\n")

@@ -7,6 +7,10 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib
 import seaborn
+import json
+
+config = json.load(open('../config.json'))
+
 plt.rcParams["figure.figsize"] = (10, 7)
 
 
@@ -44,7 +48,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     if download:
         os.system("rm -rf results/")
         os.system(
-            "scp -r -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s ."%dir)
+            "scp -r -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s ."%(config['jade_account'], dir))
 
     dir = "results/"
     raw = None
@@ -97,7 +101,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     import seaborn as sns
     # RdYlGn
-    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
+    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
     ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
     plt.savefig('../plots/matrix.png')
 
@@ -139,7 +143,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     plt.clf()
     # sns.set(rc={'figure.figsize': (80, 80)})
     matplotlib.rc('ytick', labelsize=8)
-    ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="gray", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
+    ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
     ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
     plt.tight_layout()
     plt.savefig('../plots/species.png')
@@ -180,5 +184,5 @@ if __name__ == "__main__":
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", raw_sizes, aug_factors, False, k)
+    main(experiment_dir + "results/", raw_sizes, aug_factors, True, k)
     os.system("git add ../plots/matrix-std.png ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")

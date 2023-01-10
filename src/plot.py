@@ -4,6 +4,8 @@ import pandas
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (10, 7)
+import json
+config = json.load(open('../config.json'))
 
 
 def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
@@ -22,8 +24,8 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
                 l += [('a_%i'%j, "%sfold_%i/augment_%i_%i/runs/augment2/results.csv"%(experiment_dir, 10+i, raw_size, j), 10+i)]
 
         for t, f, i in l:
-            os.system("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(f, i, raw_size, t))
-            print("scp -i ~/.ssh/id_rsa_jade ccm30-dxa01@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(f, i, raw_size, t))
+            os.system("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], f, i, raw_size, t))
+            print("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:/jmain02/home/J2AD013/dxa01/ccm30-dxa01/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], f, i, raw_size, t))
 
     dfs = []
     i_ = [10 + i for i in range(1, k+1)]
@@ -114,7 +116,10 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     kfold['raw_%i'%raw_size].plot(ax=ax, x='cumtime', y='raw_%i'%raw_size, linestyle='solid', color='black', title='%i-fold Monte Carlo cross validation mean mAP per epoch'%k)
     plt.fill_between(color='lightgray', x=kfold['raw_%i'%raw_size]['cumtime'], y1=kfold['raw_%i'%raw_size]['raw_%i'%raw_size] - kfold['raw_%i'%raw_size]['std']/(2*math.sqrt(k)), y2=kfold['raw_%i'%raw_size]['raw_%i'%raw_size] + kfold['raw_%i'%raw_size]['std']/(2*math.sqrt(k)))
 
-    linestyles = ['dashed', 'dashdot', 'dotted', '--']
+    # linestyles = ['dashed', 'dashdot', 'dotted', '--']
+
+    colors = [(0.9, 0.6, 0), (0.33, 0.7, 0.9), (0, 0.6, 0.45), (0.83, 0.36, 0)]
+
     # styles = {1 : 0, 2 : 1, 4 : 2, 8 : 3}
     styles = {i: j for i, j in zip(aug_factors, range(len(aug_factors)))}
 
@@ -123,7 +128,8 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
         kfold['aug_%i'%j]['raw_%i+aug_%i'%(raw_size,j)] = kfold['aug_%i'%j].mean(axis=1)
         kfold['aug_%i'%j]['cumtime'] = cs(timings[1], kfold['aug_%i'%j])
         print(kfold['aug_%i'%j])
-        kfold['aug_%i'%j].plot(ax=ax, x='cumtime', y='raw_%i+aug_%i'%(raw_size, j), linestyle=linestyles[styles[j]], color='black')
+        # , linestyle = linestyles[styles[j]]
+        kfold['aug_%i'%j].plot(ax=ax, x='cumtime', y='raw_%i+aug_%i'%(raw_size, j), color=colors[styles[j]])
         plt.fill_between(color='lightgray', x=kfold['aug_%i'%j]['cumtime'], y1=kfold['aug_%i'%j]['raw_%i+aug_%i'%(raw_size, j)] - kfold['aug_%i'%j]['std']/(2*math.sqrt(k)), y2=kfold['aug_%i'%j]['raw_%i+aug_%i'%(raw_size, j)] + kfold['aug_%i'%j]['std']/(2*math.sqrt(k)))
 
 
@@ -189,9 +195,9 @@ if __name__ == "__main__":
     aug_factors = [1, 2, 4, 8]
 
 
-    raw_sizes = [500]
-    aug_factors = [1]
-    timings = [[868, 6300]]
+    # raw_sizes = [500]
+    # aug_factors = [1]
+    # timings = [[868, 6300]]
 
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]
