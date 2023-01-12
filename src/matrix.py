@@ -48,7 +48,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     if download:
         os.system("rm -rf results/")
         os.system(
-            "scp -r -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s ."%(config['jade_home'], config['jade_account'], dir))
+            "scp -r -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s ."%( config['jade_account'], config['jade_home'], dir))
 
     dir = "results/"
     raw = None
@@ -143,8 +143,12 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     plt.clf()
     # sns.set(rc={'figure.figsize': (80, 80)})
     matplotlib.rc('ytick', labelsize=8)
-    ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
-    ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
+    print(df_species.columns)
+    df_species.sort_index(inplace=True, ascending=False)
+    ax = plt.barh(width=df_species['(500, 1)'], y=df_species.index) #[], label=df_species.index)
+    plt.xlabel("mean mAP delta over %i fold(s)"%k)
+    # ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
+    # ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
     plt.tight_layout()
     plt.savefig('../plots/species.png')
 
@@ -184,5 +188,8 @@ if __name__ == "__main__":
         experiment_dir += '/'
 
     # main("../data/experiments/montecarlo/results/", [1], [1, 2, 4])
-    main(experiment_dir + "results/", raw_sizes, aug_factors, True, k)
-    os.system("git add ../plots/matrix-std.png ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")
+    expstr = '_'.join([str(r) for r in raw_sizes]) + '_' + '_'.join([str(a) for a in aug_factors])
+    main(experiment_dir + "results/", raw_sizes, aug_factors, False, k)
+    os.system("cp ../plots/matrix.png ../plots/matrix_%s.png" % expstr)
+    os.system("cp ../plots/species.png ../plots/species_%s.png" % expstr)
+    # os.system("git add ../plots/matrix-std.png ../plots/matrix.png ../plots/species.png;git commit -m 'test results update';git push")

@@ -24,8 +24,8 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
                 l += [('a_%i'%j, "%sfold_%i/augment_%i_%i/runs/augment2/results.csv"%(experiment_dir, 10+i, raw_size, j), 10+i)]
 
         for t, f, i in l:
-            os.system("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], config['jade_home'],  f, i, raw_size, t))
             print("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], config['jade_home'], f, i, raw_size, t))
+            os.system("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], config['jade_home'],  f, i, raw_size, t))
 
     dfs = []
     i_ = [10 + i for i in range(1, k+1)]
@@ -102,13 +102,14 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     for t, df, i in dfs:
         df[t+str(i)] = df['metrics/mAP_0.5:0.95']
         # df[t+str(i)].plot(legend=True, title='Superbeast 101 augmented with %i images per species'%n_augment)
-        print(t)
+        # print(t)
         kfold[t][i] = df['metrics/mAP_0.5:0.95']
-
+    print(kfold)
     kfold['raw_%i'%raw_size]['raw_%i'%raw_size] = kfold['raw_%i'%raw_size].mean(axis=1)
     kfold['raw_%i'%raw_size]['std'] = kfold['raw_%i'%raw_size].std(axis=1)
     kfold['raw_%i'%raw_size]['cumtime'] = cs(timings[0], kfold['raw_%i'%raw_size])
 
+    print(kfold)
     import math
     # kfold['raw_%i'%raw_size].plot(ax=ax, use_index=True, y='raw', color='black', title='K-fold cross validation')
     # kfold['aug_'].plot(ax=ax, use_index=True, y='raw+aug', color='gray')
@@ -124,13 +125,14 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     styles = {i: j for i, j in zip(aug_factors, range(len(aug_factors)))}
 
     for j in aug_factors:
-        kfold['aug_%i'%j]['std'] = kfold['aug_%i'%j].std(axis=1)
         kfold['aug_%i'%j]['raw_%i+aug_%i'%(raw_size,j)] = kfold['aug_%i'%j].mean(axis=1)
+        kfold['aug_%i'%j]['std'] = kfold['aug_%i'%j].std(axis=1)
         kfold['aug_%i'%j]['cumtime'] = cs(timings[1], kfold['aug_%i'%j])
-        print(kfold['aug_%i'%j])
+        # print(kfold['aug_%i'%j])
         # , linestyle = linestyles[styles[j]]
-        kfold['aug_%i'%j].plot(ax=ax, x='cumtime', y='raw_%i+aug_%i'%(raw_size, j), color=colors[styles[j]])
-        plt.fill_between(color='lightgray', x=kfold['aug_%i'%j]['cumtime'], y1=kfold['aug_%i'%j]['raw_%i+aug_%i'%(raw_size, j)] - kfold['aug_%i'%j]['std']/(2*math.sqrt(k)), y2=kfold['aug_%i'%j]['raw_%i+aug_%i'%(raw_size, j)] + kfold['aug_%i'%j]['std']/(2*math.sqrt(k)))
+        aug = kfold['aug_%i'%j]#.iloc[:45]
+        aug.plot(ax=ax, x='cumtime', y='raw_%i+aug_%i'%(raw_size, j), color=colors[styles[j]])
+        plt.fill_between(color='lightgray', x=aug['cumtime'], y1=aug['raw_%i+aug_%i'%(raw_size, j)] - aug['std']/(2*math.sqrt(k)), y2=aug['raw_%i+aug_%i'%(raw_size, j)] + aug['std']/(2*math.sqrt(k)))
 
 
     # plt.fill_between(x=kfold['aug_'].index, y1=kfold['aug_']['raw+aug'] - kfold['aug_']['std'], y2=kfold['aug_']['raw+aug'] + kfold['aug_']['std'])
@@ -143,7 +145,39 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     plt.ylabel('metrics/mAP_0.5:0.95')
     fig.savefig('montecarlo-shuffle.png')
 
-    print(kfold)
+    delta = {}
+    # delta['raw_%i'%raw_size] = pandas.DataFrame()
+    # fig, ax = plt.subplots()
+
+    # for t, df, i in dfs: #[:4]:
+        # print(t, i, df)
+
+    raw = kfold['raw_%i'%raw_size]
+
+    for j in aug_factors:
+        delta['aug_%i'%j] = pandas.DataFrame()
+        for index, aug in kfold['aug_%i' % j].iterrows():
+            v = aug['raw_%i+aug_%i'%(raw_size,j)]
+            t = aug['cumtime']
+            v_raw = None
+            for index, row in raw.iterrows():
+                t2 = row['cumtime']
+                if t2 > t:
+                    break
+                v_raw = row['raw_%i'%raw_size]
+            if v_raw is not None:
+                d = v - v_raw
+                delta['aug_%i' % j] = pandas.concat([delta['aug_%i' % j], pandas.DataFrame([{'cumtime': t, 'mAP delta': d}])])
+
+    fig, ax = plt.subplots()
+    for k in delta.keys():
+        # print(delta[k])
+        delta[k].plot(ax=ax, x='cumtime', y='mAP delta', legend=True, title='mAP Delta')
+    plt.xlabel('time(s)')
+    plt.ylabel('metrics/mAP_0.5:0.95 delta')
+    fig.savefig('delta_%i.png'%raw_size)
+
+    # print(kfold)
 
 
 if __name__ == "__main__":
@@ -190,18 +224,18 @@ if __name__ == "__main__":
     # timings raw 8
     timings.append([120, 188, 261, 407, 682])
 
-    raw_size = 8
+    # raw_size = 8
+
     raw_sizes = [1, 2, 4, 8]
     aug_factors = [1, 2, 4, 8]
 
-
     # raw_sizes = [500]
     # aug_factors = [1]
-    # timings = [[868, 6300]]
+    # timings = [[780, 5340]]
 
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]
         main(experiment_dir, k, aug_factors, timings[i], raw_size, download=True)
         os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
         os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
-        os.system("git add ../plots/montecarlo_*;git commit -m 'training results update'; git push")
+        # os.system("git add ../plots/montecarlo_*;git commit -m 'training results update'; git push")
