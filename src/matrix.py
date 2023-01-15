@@ -128,27 +128,37 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     species_columns = [(r, a) for r in raw_sizes for a in aug_factors]
     df_species = pd.DataFrame()
+    df_species_std = pd.DataFrame()
 
     for (r, a) in deltas_species.keys():
         # print((r, a))
         species_list = list(dfs[(r, a)]['Class'])[1:]
         df = pd.DataFrame(deltas_species[(r, a)])
         df.columns = species_list
-        # print(df)
+        print(df.T)
+        table_species = df.T
         mean = pd.DataFrame(df.mean(axis=0))
         mean.columns = [str((r, a))]
-        df_species = pd.merge(df_species, mean, how='outer', left_index = True, right_index = True)
+        std = pd.DataFrame(df.std(axis=0))/(2*math.sqrt(k))
+        std.columns = [str((r, a))]
+        df_species = pd.merge(df_species, mean, how='outer', left_index= True, right_index= True)
+        df_species_std = pd.merge(df_species_std, std, how='outer', left_index= True, right_index= True)
 
-    print(df_species)
+    # print(deltas_species)
+    print(df_species_std)
     plt.clf()
     # sns.set(rc={'figure.figsize': (80, 80)})
     matplotlib.rc('ytick', labelsize=8)
     print(df_species.columns)
     df_species.sort_index(inplace=True, ascending=False)
-    ax = plt.barh(width=df_species['(500, 1)'], y=df_species.index) #[], label=df_species.index)
-    plt.xlabel("mean mAP delta over %i fold(s)"%k)
-    # ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
-    # ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
+    df_species_std.sort_index(inplace=True, ascending=False)
+    ax = None
+    if len(raw_sizes) == 1 and len(aug_factors) == 1:
+        ax = plt.barh(width=df_species[df_species.columns[0]], y=df_species.index, xerr=df_species_std[df_species.columns[0]], alpha = 0.3) #[], label=df_species.index)
+        plt.xlabel("mean mAP delta over %i fold(s)"%k)
+    else:
+        ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
+        ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
     plt.tight_layout()
     plt.savefig('../plots/species.png')
 
@@ -156,6 +166,20 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     # transpose.columns = deltas_species_columns
     # print(transpose)
     # print(df_species.mean(axis=0))
+
+    if True:
+        from tabulate import tabulate
+        table_species.sort_index(inplace=True, ascending=True)
+        col_mean = table_species.mean(axis=0)
+        table_species = table_species.T
+        table_species['mean'] = col_mean
+        table_species = table_species.T
+        # table_species = pd.concat([table_species, col_mean.T])
+        mean = table_species.mean(axis=1)
+        std = table_species.std(axis=1)
+        table_species['mean'] = mean
+        table_species['std error'] = std / ( math.sqrt(k))
+        print(tabulate(table_species, table_species.columns, tablefmt='latex'))
 
 
 if __name__ == "__main__":
