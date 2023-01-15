@@ -229,9 +229,9 @@ if __name__ == "__main__":
     raw_sizes = [1, 2, 4, 8]
     aug_factors = [1, 2, 4, 8]
 
-    # raw_sizes = [500]
-    # aug_factors = [1]
-    # timings = [[780, 5340]]
+    raw_sizes = [500]
+    aug_factors = [1]
+    timings = [[780, 5340]]
 
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]
