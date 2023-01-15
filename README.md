@@ -29,12 +29,14 @@ sh plot.sh
 
 ## Test results
 
-![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/matrix.png?raw=true "mean test results")
+![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/matrix_1_2_4_8_1_2_4_8.png?raw=true "mean test results")
 ![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/matrix-std.png?raw=true "mean std error")
-![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/species.png?raw=true "test results on species")
+![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/species_1_2_4_8_1_2_4_8.png?raw=true "test results on species")
 
 # Results of 500,1 run
 
 ## Training results
 
 ![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/montecarlo_500.png?raw=true "training results on 500 images per species")
+![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/matrix_500_1.png?raw=true "mean test results")
+![alt text](https://github.com/cedricidsai/darwin/blob/main/plots/species_500_1.png?raw=true "test results on species")
