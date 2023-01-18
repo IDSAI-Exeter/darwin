@@ -12,7 +12,7 @@ import json
 config = json.load(open('../config.json'))
 
 plt.rcParams["figure.figsize"] = (10, 7)
-
+plt.rcParams.update({'font.size': 18})
 
 def parse(f):
     intable = False
@@ -79,8 +79,10 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
                         for i in range(1, len(augment)):
                             # species_list.append(augment.iloc[i]['Class'])
                             species.append(float(augment.iloc[i]['mAP50-95']) - float(raw.iloc[i]['mAP50-95']))
+                        species = pd.DataFrame(species).T
+                        species.columns = list(augment['Class'])[1:]
                         deltas_species[(j, a)].append(species)
-                        dfs[(j, a)] = augment
+                        dfs[(fold, j, a)] = augment
                 deltas.append(delta)
                 deltas_matrix[r_index].append(delta)
                 # print(deltas_matrix)
@@ -101,7 +103,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     import seaborn as sns
     # RdYlGn
-    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
+    ax = sns.heatmap(matrix, annot=True, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i iterations"%k})
     ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
     plt.savefig('../plots/matrix.png')
 
@@ -109,7 +111,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     # import matplotlib as mpl
     # norm = mpl.colors.Normalize(vmin=0.001, vmax=0.007)
     # RdYlGn
-    ax = sns.heatmap(std, annot=True, fmt=".7f", center=0, cmap="gray_r", cbar_kws={'label': "standard error of the mean mAP delta over %i fold(s)"%k})
+    ax = sns.heatmap(std, annot=True, fmt=".7f", center=0, cmap="gray_r", cbar_kws={'label': "standard error of the mean mAP delta over %i iterations"%k})
     ax.set(xlabel="# raw images per species", ylabel="augmentation factor")
     plt.savefig('../plots/matrix-std.png')
     # plt.show()
@@ -132,10 +134,11 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
 
     for (r, a) in deltas_species.keys():
         # print((r, a))
-        species_list = list(dfs[(r, a)]['Class'])[1:]
-        df = pd.DataFrame(deltas_species[(r, a)])
-        df.columns = species_list
-        print(df.T)
+        # species_list = list(dfs[('fold_12', r, a)]['Class'])[1:]
+        # df = pd.DataFrame(deltas_species[(r, a)])
+        # df.columns = species_list
+        # print(df.T)
+        df = pd.concat(deltas_species[(r, a)], join='outer')
         table_species = df.T
         mean = pd.DataFrame(df.mean(axis=0))
         mean.columns = [str((r, a))]
@@ -145,19 +148,19 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
         df_species_std = pd.merge(df_species_std, std, how='outer', left_index= True, right_index= True)
 
     # print(deltas_species)
-    print(df_species_std)
+    # print(df_species_std)
     plt.clf()
     # sns.set(rc={'figure.figsize': (80, 80)})
     matplotlib.rc('ytick', labelsize=8)
-    print(df_species.columns)
-    df_species.sort_index(inplace=True, ascending=False)
-    df_species_std.sort_index(inplace=True, ascending=False)
+    # print(df_species.columns)
+    df_species.sort_index(inplace=True, ascending=True)
+    df_species_std.sort_index(inplace=True, ascending=True)
     ax = None
     if len(raw_sizes) == 1 and len(aug_factors) == 1:
         ax = plt.barh(width=df_species[df_species.columns[0]], y=df_species.index, xerr=df_species_std[df_species.columns[0]], alpha = 0.3) #[], label=df_species.index)
-        plt.xlabel("mean mAP delta over %i fold(s)"%k)
+        plt.xlabel("mean mAP delta over %i iterations"%k)
     else:
-        ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i fold(s)"%k})
+        ax = sns.heatmap(df_species, xticklabels=1, yticklabels=1,  annot=False, fmt=".7f", center=0, cmap="Spectral", cbar_kws={'label': "mean mAP delta over %i iteration(s)"%k})
         ax.set(xlabel="(# raw images per species, augmentation factor)", ylabel="species")
     plt.tight_layout()
     plt.savefig('../plots/species.png')
@@ -167,7 +170,36 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     # print(transpose)
     # print(df_species.mean(axis=0))
 
-    if True:
+    if False:
+        map_results = pd.DataFrame()
+        for key, df in dfs.items():
+            map_results[key] = df['mAP50-95'].astype(float)
+        map_results.index = dfs.popitem()[1]['Class']
+        map_results.drop(index='all', inplace=True)
+
+        map_results = map_results.mean(axis=1)
+        map_results.sort_index(inplace=True, ascending=True)
+
+        segments = pd.DataFrame.from_dict({'zorilla' : 1, 'genet': 1,'rhinoceros':1, 'elephant': 536, 'eland': 410, 'topi': 337, 'ostrich': 316, 'reedbuck': 235, 'baboon': 234, 'lionfemale': 212, 'warthog': 138, 'waterbuck': 101, 'zebra': 99, 'lionmale': 94, 'hippopotamus': 82, 'hartebeest': 80, 'dikdik': 69, 'hyenaspotted': 65, 'monkeyvervet': 59, 'cheetah': 57, 'gazellegrants': 43, 'koribustard': 41, 'jackal': 41, 'bushbuck': 41, 'buffalo': 38, 'guineafowl': 32, 'wildebeest': 25, 'impala': 23, 'gazellethomsons': 22, 'leopard': 22, 'serval': 18, 'aardvark': 18, 'otherbird': 16, 'mongoose': 14, 'giraffe': 13, 'hare': 9, 'porcupine': 9, 'aardwolf': 7, 'caracal': 6, 'secretarybird': 5, 'honeybadger': 3, 'hyenastriped': 3, 'wildcat': 3, 'batearedfox': 3, 'rodents': 2, 'civet': 2, 'reptiles': 2}, orient='index')
+        segments.sort_index(inplace=True, ascending=True)
+
+        map_segments = pd.concat([map_results, segments], axis=1)
+        map_segments.columns = ['mAP', '#segments']
+        print(map_segments)
+        plt.clf()
+        ax = sns.regplot(data=map_segments, x='#segments', y='mAP', logx=True)
+        import scipy
+        y = list(map_segments['mAP'])
+        x = [math.log(v) for v in list(map_segments['#segments'])]
+        #x = [math.log(v) for v in ax.get_lines()[0].get_xdata()]
+        #y = ax.get_lines()[0].get_ydata()
+        print(x,y)
+        slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(x=x, y=y)
+        print("slope, intercept, r_value, p_value, std_err", slope, intercept, r_value, p_value, std_err)
+        plt.tight_layout()
+        plt.savefig('../plots/map_segments.png')
+
+    if False:
         from tabulate import tabulate
         table_species.sort_index(inplace=True, ascending=True)
         col_mean = table_species.mean(axis=0)

@@ -4,6 +4,8 @@ import pandas
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (10, 7)
+plt.rcParams.update({'font.size': 18})
+
 import json
 config = json.load(open('../config.json'))
 
@@ -13,8 +15,6 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     l = []
 
     if download:
-        os.system("rm -rf csv/")
-        os.mkdir("csv")
         for i in range(1, k+1):
             print(experiment_dir + "fold_%i"%(10+i))
             l += [('raw', "%sfold_%i/raw_%i/runs/raw/results.csv"%(experiment_dir, 10+i, raw_size), 10+i)]
@@ -77,8 +77,10 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
 
     fig, ax = plt.subplots()
     for t, df, i in dfs:#[:4]:
-        df[t+str(i)] = df['metrics/mAP_0.5:0.95']
-        df.plot(ax=ax, x='cumtime', y=t+str(i), legend=True, title='Superbeast 101')
+        # df[t+str(i)] = df['metrics/mAP_0.5:0.95']
+        # df.plot(ax=ax, x='cumtime', y=t+str(i), legend=True)#, title='Superbeast 101')
+        df[t[:4] + 'iteration_' + str(i-10)] = df['metrics/mAP_0.5:0.95']
+        df.plot(ax=ax, x='cumtime', y=t[:4] + 'iteration_' + str(i-10), legend=True)#, title='Superbeast 101')
         print(df.columns)
     plt.ylabel('metrics/mAP_0.5:0.95')
     plt.xlabel('time(s)')
@@ -86,8 +88,10 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
 
     fig, ax = plt.subplots()
     for t, df, i in dfs:#[:4]:
-        df[t+str(i)] = df['metrics/mAP_0.5:0.95']
-        df[t+str(i)].plot(legend=True, title='Superbeast 101')
+        # df[t+str(i)] = df['metrics/mAP_0.5:0.95']
+        # df[t+str(i)].plot(legend=True)#, title='Superbeast 101')
+        df[t[:4] + 'iteration_' + str(i-10)] = df['metrics/mAP_0.5:0.95']
+        df[t[:4] + 'iteration_' + str(i-10)].plot(legend=True)  # , title='Superbeast 101')
     plt.xlabel('epochs')
     plt.ylabel('metrics/mAP_0.5:0.95')
     fig.savefig('epochs.png')
@@ -114,7 +118,7 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     # kfold['raw_%i'%raw_size].plot(ax=ax, use_index=True, y='raw', color='black', title='K-fold cross validation')
     # kfold['aug_'].plot(ax=ax, use_index=True, y='raw+aug', color='gray')
 
-    kfold['raw_%i'%raw_size].plot(ax=ax, x='cumtime', y='raw_%i'%raw_size, linestyle='solid', color='black', title='%i-fold Monte Carlo cross validation mean mAP per epoch'%k)
+    kfold['raw_%i'%raw_size].plot(ax=ax, x='cumtime', y='raw_%i'%raw_size, linestyle='solid', color='black')#, title='%i-fold Monte Carlo cross validation mean mAP per epoch'%k)
     plt.fill_between(color='lightgray', x=kfold['raw_%i'%raw_size]['cumtime'], y1=kfold['raw_%i'%raw_size]['raw_%i'%raw_size] - kfold['raw_%i'%raw_size]['std']/(2*math.sqrt(k)), y2=kfold['raw_%i'%raw_size]['raw_%i'%raw_size] + kfold['raw_%i'%raw_size]['std']/(2*math.sqrt(k)))
 
     # linestyles = ['dashed', 'dashdot', 'dotted', '--']
@@ -233,9 +237,11 @@ if __name__ == "__main__":
     aug_factors = [1]
     timings = [[780, 5340]]
 
+    # os.system("rm -rf csv/")
+    # os.mkdir("csv")
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]
-        main(experiment_dir, k, aug_factors, timings[i], raw_size, download=True)
+        main(experiment_dir, k, aug_factors, timings[i], raw_size, download=False)
         os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
         os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
         # os.system("git add ../plots/montecarlo_*;git commit -m 'training results update'; git push")
