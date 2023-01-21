@@ -176,9 +176,10 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
     fig, ax = plt.subplots()
     for k in delta.keys():
         # print(delta[k])
-        delta[k].plot(ax=ax, x='cumtime', y='mAP delta', legend=True, title='mAP Delta')
-    plt.xlabel('time(s)')
-    plt.ylabel('metrics/mAP_0.5:0.95 delta')
+        delta[k].plot(ax=ax, x='cumtime', y='mAP delta', legend=False)
+    plt.axhline(y=0.0, color='r', linestyle='-')
+    plt.xlabel('time($s$)')
+    plt.ylabel('$\overline{mAP\Delta}$')
     fig.savefig('delta_%i.png'%raw_size)
 
     # print(kfold)

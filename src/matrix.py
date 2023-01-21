@@ -170,7 +170,7 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
     # print(transpose)
     # print(df_species.mean(axis=0))
 
-    if False:
+    if True:
         map_results = pd.DataFrame()
         for key, df in dfs.items():
             map_results[key] = df['mAP50-95'].astype(float)
@@ -184,12 +184,12 @@ def main(dir, raw_sizes, aug_factors, download=False, k = 1):
         segments.sort_index(inplace=True, ascending=True)
 
         map_segments = pd.concat([map_results, segments], axis=1)
-        map_segments.columns = ['mAP', '#segments']
+        map_segments.columns = ['$\overline{mAP}$', '#segments']
         print(map_segments)
         plt.clf()
-        ax = sns.regplot(data=map_segments, x='#segments', y='mAP', logx=True)
+        ax = sns.regplot(data=map_segments, x='#segments', y='$\overline{mAP}$', logx=True)
         import scipy
-        y = list(map_segments['mAP'])
+        y = list(map_segments['$\overline{mAP}$'])
         x = [math.log(v) for v in list(map_segments['#segments'])]
         #x = [math.log(v) for v in ax.get_lines()[0].get_xdata()]
         #y = ax.get_lines()[0].get_ydata()
