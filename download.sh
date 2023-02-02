@@ -12,7 +12,7 @@ cd ..;
 mkdir data/serengeti_bboxes
 mkdir data/serengeti_bboxes/images
 
-cd src;python3 join_bbox_species.py;python3 download_bbox.py
+cd src;python3 join_bbox_species.py;python3 download_bbox.py;python3 generate_labels_species.py
 cd ../
 
 find data/images/ -type f -exec cp {} data/serengeti_bboxes/images/ \;
