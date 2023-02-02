@@ -11,6 +11,7 @@ pip3 install rembg
 mkdir data;mkdir data/experiments;mkdir data/runs
 mkdir data/animals
 pip3 install pandas
+pip3 install pyyaml
 cd lib
 wget https://aka.ms/downloadazcopy-v10-linux
 tar -xvf downloadazcopy-v10-linux
