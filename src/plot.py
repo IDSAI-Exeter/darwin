@@ -24,8 +24,8 @@ def main(experiment_dir, k, aug_factors, timings, raw_size, download=True):
                 l += [('a_%i'%j, "%sfold_%i/augment_%i_%i/runs/augment2/results.csv"%(experiment_dir, 10+i, raw_size, j), 10+i)]
 
         for t, f, i in l:
-            print("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], config['jade_home'], f, i, raw_size, t))
-            os.system("scp -i ~/.ssh/id_rsa_jade %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_account'], config['jade_home'],  f, i, raw_size, t))
+            print("scp -i %s %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_shh_key'], config['jade_account'], config['jade_home'], f, i, raw_size, t))
+            os.system("scp -i %s %s@jade2.hartree.stfc.ac.uk:%s/%s csv/fold_%i_r_%i_%s.csv"%(config['jade_shh_key'], config['jade_account'], config['jade_home'],  f, i, raw_size, t))
 
     dfs = []
     i_ = [10 + i for i in range(1, k+1)]
@@ -235,14 +235,17 @@ if __name__ == "__main__":
     aug_factors = [1, 2, 4, 8]
 
     raw_sizes = [500]
-    aug_factors = [1]
-    timings = [[780, 5340]]
+    #aug_factors = [1]
+    #timings = [[780, 5340]]
+
+    aug_factors = [1, 2, 4, 8]
+    timings = [[852, 5082, 9969, 19200, 43200]]
 
     # os.system("rm -rf csv/")
-    # os.mkdir("csv")
+    os.mkdir("csv")
     for i in range(0, len(raw_sizes)):
         raw_size = raw_sizes[i]
-        main(experiment_dir, k, aug_factors, timings[i], raw_size, download=False)
+        main(experiment_dir, k, aug_factors, timings[i], raw_size, download=True)
         os.system("mv montecarlo-shuffle.png epochs.png time.png ../plots/")
         os.system("cp ../plots/montecarlo-shuffle.png ../plots/montecarlo_%i.png"%raw_size)
         # os.system("git add ../plots/montecarlo_*;git commit -m 'training results update'; git push")

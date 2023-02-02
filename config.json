@@ -1,3 +1,4 @@
 {"email": "cedric.mesnage@gmail.com",
   "jade_account": "ccm30-dxa01",
-  "jade_home" :  "/jmain02/home/J2AD013/dxa01/ccm30-dxa01"}
+  "jade_home" :  "/jmain02/home/J2AD013/dxa01/ccm30-dxa01",
+  "jade_ssh_key" :  "~/.ssh/id_rsa_jade"}

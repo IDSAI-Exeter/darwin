@@ -2,6 +2,9 @@
 
 Species identification accuracy optimisation with automated copy-pasting for camera-trap images.
 
+# Configure
+
+edit the config.json file with your jade account, jade ssh key file path, jade home directory and email address.
 
 # Run
 
